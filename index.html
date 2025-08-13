@@ -7,33 +7,34 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background: #1a1a1a; color: #e5e5e5; font-family: Helvetica, Arial, sans-serif; }
-        .bateman { color: #b22222;  }
+        .bateman { color: #b22222; }
         .card { background: #2a2a2a; border: 1px solid #b22222; border-radius: 8px; }
         a:hover { color: #ff4040; }
     </style>
 </head>
 <body>
     <header class="py-4 text-center border-b border-gray-700">
-        <h1 class="text-3xl font-bold bateman ">MyuraASM</h1>
+        <h1 class="text-3xl font-bold bateman">MyuraASM</h1>
         <p class="text-gray-400">Malware research.</p>
-        <img src="logo.png" alt="MyuraASM Logo" class="mx-auto mt-2 w-20">
     </header>
 
     <main class="container mx-auto px-4 py-8">
         <section class="mb-8">
             <h2 class="text-2xl bateman">Projects</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Hello Kitty Reverse Shell -->
-                <div class="card p-4">
-                    <img src="Gx13me7XkAAjP_H.png" alt="Reverse Shell" class="w-full h-40 object-cover rounded mb-2">
+                <div class="card p-6">
+                    <img src="https://raw.githubusercontent.com/MyuraASM/MyuraASM.github.io/main/Gx13me7XkAAjP_H.png" alt="Reverse Shell" class="w-full h-64 object-contain rounded mb-4">
                     <h3 class="text-xl bateman">Hello Kitty Reverse Shell</h3>
-                   
+                    <p class="text-gray-400">Covert shell for educational analysis. Sandbox only.</p>
+                    <a href="https://github.com/MyuraASM/hello-kitty-revshell" class="text-red-500 hover:text-red-400">Code</a>
                 </div>
                 <!-- Hello Kitty Web Stress Tester -->
-                <div class="card p-4">
-                    <img src="Gx6icTJXwAANbpT.png" alt="Stress Tester" class="w-full h-40 object-cover rounded mb-2">
+                <div class="card p-6">
+                    <img src="https://raw.githubusercontent.com/MyuraASM/MyuraASM.github.io/main/Gx6icTJXwAANbpT.png" alt="Stress Tester" class="w-full h-64 object-contain rounded mb-4">
                     <h3 class="text-xl bateman">Hello Kitty Web Stress Tester</h3>
-                   
+                    <p class="text-gray-400">Tests server limits. Ethical use in controlled environments.</p>
+                    <a href="https://github.com/MyuraASM/hello-kitty-stresstester" class="text-red-500 hover:text-red-400">Code</a>
                 </div>
             </div>
         </section>
