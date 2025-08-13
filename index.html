@@ -3,56 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MalwareDev Insights</title>
+    <title>MyuraASM</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #1a1a1a; color: #e5e5e5; font-family: Helvetica, Arial, sans-serif; }
+        .bateman { color: #b22222;  }
+        .card { background: #2a2a2a; border: 1px solid #b22222; border-radius: 8px; }
+        a:hover { color: #ff4040; }
+    </style>
 </head>
-<body class="bg-gray-100 font-sans">
-    <header class="bg-blue-600 text-white py-6">
-        <div class="container mx-auto px-4">
-            <h1 class="text-3xl font-bold">MalwareDev Insights</h1>
-            <p class="mt-2 text-lg">Educational Resources for Malware Analysis & Cybersecurity Research</p>
-        </div>
+<body>
+    <header class="py-4 text-center border-b border-gray-700">
+        <h1 class="text-3xl font-bold bateman ">MyuraASM</h1>
+        <p class="text-gray-400">Malware research.</p>
+        <img src="logo.png" alt="MyuraASM Logo" class="mx-auto mt-2 w-20">
     </header>
 
     <main class="container mx-auto px-4 py-8">
         <section class="mb-8">
-            <h2 class="text-2xl font-semibold mb-4">Welcome to MalwareDev Insights</h2>
-            <p class="text-gray-700">
-                This site is dedicated to advancing cybersecurity knowledge through the study of malware development and analysis. 
-                Explore tutorials, tools, and resources designed for security researchers, students, and professionals. 
-                All content is intended for ethical and legal use in controlled environments.
-            </p>
-        </section>
-
-        <section class="mb-8">
-            <h2 class="text-2xl font-semibold mb-4">What You'll Find Here</h2>
-            <ul class="list-disc pl-6 text-gray-700">
-                <li>Tutorials on reverse-engineering and analyzing malware.</li>
-                <li>Case studies of historical malware and their impact.</li>
-                <li>Open-source tools for safe, sandboxed malware research.</li>
-                <li>Resources for ethical hacking and cybersecurity certifications.</li>
-            </ul>
-        </section>
-
-        <section class="mb-8">
-            <h2 class="text-2xl font-semibold mb-4">Get Started</h2>
-            <p class="text-gray-700">
-                Check out our <a href="tutorials.html" class="text-blue-600 hover:underline">tutorials</a> 
-                or explore our <a href="tools.html" class="text-blue-600 hover:underline">tools</a> 
-                to begin your journey in malware analysis. 
-                Always follow ethical guidelines and use these resources responsibly.
-            </p>
+            <h2 class="text-2xl bateman">Projects</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Hello Kitty Reverse Shell -->
+                <div class="card p-4">
+                    <img src="revshell.png" alt="Reverse Shell" class="w-full h-40 object-cover rounded mb-2">
+                    <h3 class="text-xl bateman">Hello Kitty Reverse Shell</h3>
+                   
+                </div>
+                <!-- Hello Kitty Web Stress Tester -->
+                <div class="card p-4">
+                    <img src="stresstester.png" alt="Stress Tester" class="w-full h-40 object-cover rounded mb-2">
+                    <h3 class="text-xl bateman">Hello Kitty Web Stress Tester</h3>
+                   
+                </div>
+            </div>
         </section>
     </main>
 
-    <footer class="bg-gray-800 text-white py-4">
-        <div class="container mx-auto px-4">
-            <p class="text-sm">
-                &copy; 2025 MalwareDev Insights. All rights reserved. 
-                All content is for educational purposes in controlled environments. 
-                Unauthorized use of materials for malicious purposes is strictly prohibited.
-            </p>
-        </div>
+    <footer class="bg-black text-gray-400 py-4 text-center border-t border-gray-700">
+        <p>&copy; 2025 MyuraASM. Educational use only. No misuse.</p>
     </footer>
 </body>
 </html>
