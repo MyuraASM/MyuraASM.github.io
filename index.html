@@ -20,7 +20,11 @@
             border: 1px solid #ff3b3b;
             border-radius: 10px;
             max-width: 100%;
+            min-height: 400px; /* Taller cards */
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
         .card:hover {
             transform: translateY(-5px);
@@ -55,21 +59,25 @@
     <main class="container mx-auto px-4 py-12">
         <section class="mb-12">
             <h2 class="text-3xl bateman mb-8 text-center font-semibold">Projects</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> <!-- Smaller gap -->
                 
                 <!-- Hello Kitty Reverse Shell -->
-                <div class="card p-6 mx-auto max-w-sm">
-                    <img src="https://raw.githubusercontent.com/MyuraASM/MyuraASM.github.io/main/Gx13me7XkAAjP_H.png" alt="Reverse Shell" class="mb-4">
-                    <h3 class="text-xl bateman mb-2 font-semibold">Hello Kitty Reverse Shell</h3>
-                    <p class="text-gray-400 mb-4 text-sm leading-relaxed">Covert shell for educational analysis. Designed for sandbox testing and controlled environments.</p>
+                <div class="card p-8 mx-auto max-w-sm">
+                    <div>
+                        <img src="https://raw.githubusercontent.com/MyuraASM/MyuraASM.github.io/main/Gx13me7XkAAjP_H.png" alt="Reverse Shell" class="mb-4">
+                        <h3 class="text-xl bateman mb-2 font-semibold">Hello Kitty Reverse Shell</h3>
+                        <p class="text-gray-400 mb-4 text-sm leading-relaxed">Covert shell for educational analysis. Designed for sandbox testing and controlled environments.</p>
+                    </div>
                     <a href="https://github.com/MyuraASM/hello-kitty-revshell" class="text-red-500 font-medium hover:underline">View Code →</a>
                 </div>
                 
                 <!-- Hello Kitty Web Stress Tester -->
-                <div class="card p-6 mx-auto max-w-sm">
-                    <img src="https://raw.githubusercontent.com/MyuraASM/MyuraASM.github.io/main/Gx6icTJXwAANbpT.png" alt="Stress Tester" class="mb-4">
-                    <h3 class="text-xl bateman mb-2 font-semibold">Hello Kitty Web Stress Tester</h3>
-                    <p class="text-gray-400 mb-4 text-sm leading-relaxed">Tool for load testing and performance evaluation. Ethical use only in controlled scenarios.</p>
+                <div class="card p-8 mx-auto max-w-sm">
+                    <div>
+                        <img src="https://raw.githubusercontent.com/MyuraASM/MyuraASM.github.io/main/Gx6icTJXwAANbpT.png" alt="Stress Tester" class="mb-4">
+                        <h3 class="text-xl bateman mb-2 font-semibold">Hello Kitty Web Stress Tester</h3>
+                        <p class="text-gray-400 mb-4 text-sm leading-relaxed">Tool for load testing and performance evaluation. Ethical use only in controlled scenarios.</p>
+                    </div>
                     <a href="https://github.com/MyuraASM/hello-kitty-stresstester" class="text-red-500 font-medium hover:underline">View Code →</a>
                 </div>
 
