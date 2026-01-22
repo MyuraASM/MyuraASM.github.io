@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Myura</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #ffb3d9;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        header {
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #ff69b4;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            color: #ffb3d9;
+            opacity: 0.8;
+        }
+
+        .profile-pic {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 2px solid #ff69b4;
+            margin: 30px 0;
+            display: block;
+            object-fit: cover;
+        }
+
+        section {
+            margin: 50px 0;
+        }
+
+        h2 {
+            color: #ff69b4;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        .project {
+            margin: 30px 0;
+            padding: 20px 0;
+            border-top: 1px solid #333;
+        }
+
+        .project h3 {
+            color: #ff69b4;
+            margin-bottom: 10px;
+        }
+
+        .project-img {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            margin: 20px 0;
+            border: 1px solid #ff69b4;
+        }
+
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .skill {
+            color: #ff69b4;
+        }
+
+        .skill::before {
+            content: "• ";
+        }
+
+        .links {
+            margin: 40px 0;
+        }
+
+        .links a {
+            color: #ff69b4;
+            text-decoration: none;
+            margin-right: 20px;
+            transition: opacity 0.3s;
+        }
+
+        .links a:hover {
+            opacity: 0.7;
+        }
+
+        footer {
+            margin-top: 80px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+            color: #ffb3d9;
+            opacity: 0.6;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <!-- <img src="profile.jpg" alt="Myura" class="profile-pic"> -->
+            <h1>Myura</h1>
+            <p class="subtitle">Low-level developer</p>
+        </header>
+
+        <section>
+            <h2>About</h2>
+            <p>
+                I work on operating systems and low-level programming. 
+                Interested in assembly, kernel development, and anything close to the hardware.
+            </p>
+        </section>
+
+        <section>
+            <h2>Skills</h2>
+            <div class="skills">
+                <span class="skill">OS Development</span>
+                <span class="skill">Assembly</span>
+                <span class="skill">Low-level Programming</span>
+            </div>
+        </section>
+
+        <section>
+            <h2>Projects</h2>
+            
+            <div class="project">
+                <h3>PussyOS</h3>
+                <p>
+                    A custom operating system built from scratch. Exploring bootloader development, 
+                    kernel architecture, and system programming.
+                </p>
+                <!-- <img src="pussyos-screenshot.png" alt="PussyOS Screenshot" class="project-img"> -->
+            </div>
+        </section>
+
+        <div class="links">
+            <a href="https://x.com/MyuraASM" target="_blank">Twitter</a>
+            <a href="https://github.com/yourusername" target="_blank">GitHub</a>
+        </div>
+
+        <footer>
+            <p>© 2025 Myura</p>
+        </footer>
+    </div>
+</body>
+</html>
