@@ -368,6 +368,7 @@
             <div class="nav-section-title">Core Systems</div>
             <ul class="nav-links">
                 <li><a href="#login-system">Login System</a></li>
+                <li><a href="#shell">Shell & Commands</a></li>
                 <li><a href="#filesystem">Filesystem</a></li>
                 <li><a href="#display">Display & UI</a></li>
                 <li><a href="#interrupts">Interrupts & IDT</a></li>
@@ -704,6 +705,320 @@ password. pass</code></pre>
     }
 }</code></pre>
             <p>units * 100000 iterations. tune it til it looks right</p>
+        </section>
+
+        <!-- Shell & Commands Section -->
+        <section id="shell">
+            <h2>Shell & Commands</h2>
+            <p>interactive shell that runs after login. supports 30+ commands</p>
+
+            <h3>command processor</h3>
+            <pre><code>void process_command(void) {
+    char input[81];
+    print_read_current_input_line(input, sizeof(input));
+    
+    // string matching with strncmp
+    if (strncmp(input, "echo ", 5) == 0) {
+        cmd_echo(input + 5);
+    }
+    // ... more commands
+}</code></pre>
+
+            <h3>available commands</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>command</th>
+                        <th>what it does</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>help [category]</td>
+                        <td>show commands (sys/file/app/game)</td>
+                    </tr>
+                    <tr>
+                        <td>echo &lt;text&gt;</td>
+                        <td>print text</td>
+                    </tr>
+                    <tr>
+                        <td>clear</td>
+                        <td>clear terminal (keeps UI panel)</td>
+                    </tr>
+                    <tr>
+                        <td>boobs</td>
+                        <td>ASCII art</td>
+                    </tr>
+                    <tr>
+                        <td>math &lt;op&gt; &lt;a&gt; &lt;b&gt;</td>
+                        <td>calculator</td>
+                    </tr>
+                    <tr>
+                        <td>mkfile &lt;name&gt;</td>
+                        <td>create file</td>
+                    </tr>
+                    <tr>
+                        <td>write &lt;name&gt; &lt;text&gt;</td>
+                        <td>write to file</td>
+                    </tr>
+                    <tr>
+                        <td>cat &lt;name&gt;</td>
+                        <td>show file contents</td>
+                    </tr>
+                    <tr>
+                        <td>edit &lt;name&gt;</td>
+                        <td>text editor</td>
+                    </tr>
+                    <tr>
+                        <td>rm &lt;name&gt;</td>
+                        <td>delete file</td>
+                    </tr>
+                    <tr>
+                        <td>ls</td>
+                        <td>list files</td>
+                    </tr>
+                    <tr>
+                        <td>mkdir &lt;name&gt;</td>
+                        <td>create directory</td>
+                    </tr>
+                    <tr>
+                        <td>rmdir &lt;name&gt;</td>
+                        <td>delete directory</td>
+                    </tr>
+                    <tr>
+                        <td>cd &lt;path&gt;</td>
+                        <td>change directory</td>
+                    </tr>
+                    <tr>
+                        <td>mv &lt;src&gt; &lt;dst&gt;</td>
+                        <td>move file</td>
+                    </tr>
+                    <tr>
+                        <td>rename &lt;old&gt; &lt;new&gt;</td>
+                        <td>rename file</td>
+                    </tr>
+                    <tr>
+                        <td>savefs [lba]</td>
+                        <td>save filesystem to disk</td>
+                    </tr>
+                    <tr>
+                        <td>loadfs [lba]</td>
+                        <td>load filesystem from disk</td>
+                    </tr>
+                    <tr>
+                        <td>bf &lt;file&gt;</td>
+                        <td>run brainfuck script</td>
+                    </tr>
+                    <tr>
+                        <td>pussy &lt;file&gt;</td>
+                        <td>run pussylang script</td>
+                    </tr>
+                    <tr>
+                        <td>draw [name]</td>
+                        <td>pixel art editor</td>
+                    </tr>
+                    <tr>
+                        <td>show [name]</td>
+                        <td>display drawing</td>
+                    </tr>
+                    <tr>
+                        <td>anim &lt;dir&gt; [fps]</td>
+                        <td>play animation from frames</td>
+                    </tr>
+                    <tr>
+                        <td>graph</td>
+                        <td>graphing calculator</td>
+                    </tr>
+                    <tr>
+                        <td>matrix</td>
+                        <td>matrix calculator</td>
+                    </tr>
+                    <tr>
+                        <td>3d</td>
+                        <td>3D shape visualizer</td>
+                    </tr>
+                    <tr>
+                        <td>piano</td>
+                        <td>PC speaker piano</td>
+                    </tr>
+                    <tr>
+                        <td>pciscan</td>
+                        <td>scan PCI devices</td>
+                    </tr>
+                    <tr>
+                        <td>snake</td>
+                        <td>snake game</td>
+                    </tr>
+                    <tr>
+                        <td>pong</td>
+                        <td>pong game</td>
+                    </tr>
+                    <tr>
+                        <td>3dgame</td>
+                        <td>3D walking simulator</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>categories</h3>
+            <ul>
+                <li><code>help sys</code> - system commands</li>
+                <li><code>help file</code> - file operations</li>
+                <li><code>help app</code> - applications</li>
+                <li><code>help game</code> - games</li>
+            </ul>
+        </section>
+
+        <!-- UI & Display Section -->
+        <section id="display">
+            <h2>Display & UI</h2>
+            <p>split screen: terminal left (60 cols) | info panel right (20 cols)</p>
+
+            <h3>layout</h3>
+            <pre><code>#define TERMINAL_WIDTH 60
+#define INFO_PANEL_X 60
+
+// VGA buffer: 80x25 chars at 0xB8000
+// cols 0-59:  terminal
+// col 60:     separator '|'
+// cols 61-79: info panel</code></pre>
+
+            <h3>separator</h3>
+            <pre><code>for (int row = 0; row < 25; row++) {
+    vga[row * 80 + TERMINAL_WIDTH] = '|' | (0x08 << 8);
+}</code></pre>
+
+            <h3>info panel</h3>
+            <p>shows time/date from RTC + OS info</p>
+
+            <h3>RTC reading</h3>
+            <pre><code>static inline uint8_t read_rtc(uint8_t reg) {
+    outb(RTC_ADDRESS, reg);
+    return inb(RTC_DATA);
+}
+
+// read time/date (BCD format)
+*second = bcd_to_binary(read_rtc(0x00));
+*minute = bcd_to_binary(read_rtc(0x02));
+*hour   = bcd_to_binary(read_rtc(0x04));</code></pre>
+
+            <h3>VGA colors</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>code</th>
+                        <th>usage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0x5F</td>
+                        <td>purple bg, white fg (main header)</td>
+                    </tr>
+                    <tr>
+                        <td>0x1F</td>
+                        <td>blue bg, white fg (time section)</td>
+                    </tr>
+                    <tr>
+                        <td>0x2F</td>
+                        <td>green bg, white fg (updates)</td>
+                    </tr>
+                    <tr>
+                        <td>0x6F</td>
+                        <td>brown bg, white fg (message)</td>
+                    </tr>
+                    <tr>
+                        <td>0x0A</td>
+                        <td>green text</td>
+                    </tr>
+                    <tr>
+                        <td>0x0E</td>
+                        <td>yellow text</td>
+                    </tr>
+                    <tr>
+                        <td>0x08</td>
+                        <td>dark gray (separator)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+int ui_is_in_terminal_area(int column) {
+    return column < TERMINAL_WIDTH;
+}</code></pre>
+        </section>
+
+        <!-- Interrupts & Keyboard Section -->
+        <section id="interrupts">
+            <h2>Interrupts & Keyboard</h2>
+            <p>IDT + keyboard interrupt handler for input</p>
+
+            <h3>IDT setup</h3>
+            <pre><code>void idt_init() {
+    idtp.limit = (sizeof(struct IDT_Entry) * 256) - 1;
+    idtp.base = (uint64_t)&idt;
+    
+    // keyboard handler at IRQ1 (vector 33)
+    idt_set_descriptor(33, &isr1, 0x8E);
+    
+    load_idt((uint64_t)&idtp);
+    
+    // remap PIC + enable keyboard interrupt
+    // ... (PIC init sequence)
+    
+    __asm__ volatile("sti");  // enable interrupts
+}</code></pre>
+
+            <h3>ISR stub (assembly)</h3>
+            <p>saves registers, calls handler, sends EOI:</p>
+            <pre><code>isr1:
+    push rax
+    push rbx
+    ; ... (push all other registers)
+    
+    call keyboard_handler
+    
+    pop rbx
+    pop rax
+    ; ... (pop all other registers)
+    
+    mov al, 0x20
+    out 0x20, al  // EOI to PIC
+    
+    iretq</code></pre>
+
+            <h3>keyboard handler</h3>
+            <pre><code>void keyboard_handler() {
+    uint8_t scancode = inb(0x60);
+    
+    // shift tracking
+    if (scancode == 0x2A || scancode == 0x36) {
+        shift_pressed = 1;
+        return;
+    }
+    
+    // arrow keys
+    if (scancode == 0x4B) print_move_cursor_left();
+    if (scancode == 0x4D) print_move_cursor_right();
+    
+    // convert scancode to char
+    char c = shift_pressed ? 
+        scancode_to_char_upper[scancode] : 
+        scancode_to_char[scancode];
+    
+    if (c == '\b') print_backspace();
+    else if (c == '\n') process_command();
+    else if (c) print_insert_char(c);
+}</code></pre>
+
+            <h3>PIC remapping</h3>
+            <p>remap IRQs to avoid conflicts with CPU exceptions:</p>
+            <ul>
+                <li>master PIC: IRQ 0-7 → vectors 32-39</li>
+                <li>slave PIC: IRQ 8-15 → vectors 40-47</li>
+                <li>keyboard = IRQ1 → vector 33</li>
+            </ul>
+            <p>mask: enable only keyboard (0xFD = all off except bit 1)</p>
         </section>
 
     </main>
