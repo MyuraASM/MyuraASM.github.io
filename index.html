@@ -400,8 +400,7 @@
             <h1>PussyOS</h1>
             <div class="version">v1.0 Documentation</div>
             <p class="description">
-                A custom x86-64 operating system built from scratch with a unique aesthetic and personality. 
-                Features include a custom bootloader, filesystem, login system, and terminal interface.
+                custom x86-64 OS. built from nothing. boots, works, doesn't explode (usually)
             </p>
         </div>
 
@@ -409,21 +408,19 @@
         <section id="overview">
             <h2>Overview</h2>
             <p>
-                PussyOS is a minimal x86-64 operating system that boots into long mode and provides a basic 
-                interactive shell environment. The OS features custom boot animations, a login system with 
-                configuration file support, and a persistent filesystem.
+                x86-64 OS. boots. runs. has a filesystem. doesn't crash (usually).
             </p>
 
-            <h3>Key Features</h3>
+            <h3>what it does</h3>
             <ul>
-                <li>Custom Multiboot2-compliant bootloader</li>
-                <li>Long mode (64-bit) kernel with paging</li>
-                <li>VGA text mode display with color support</li>
-                <li>Interrupt Descriptor Table (IDT) for keyboard input</li>
-                <li>Simple filesystem with disk persistence</li>
-                <li>User authentication system with configurable credentials</li>
-                <li>Animated boot sequence with ASCII art</li>
-                <li>Terminal UI with command processing</li>
+                <li>boots with multiboot2</li>
+                <li>64-bit long mode</li>
+                <li>VGA text mode</li>
+                <li>keyboard works</li>
+                <li>files on disk</li>
+                <li>login screen (3 attempts then fuck you)</li>
+                <li>ASCII art</li>
+                <li>shell that does things</li>
             </ul>
         </section>
 
@@ -431,107 +428,80 @@
         <section id="boot-sequence">
             <h2>Boot Sequence</h2>
             <p>
-                The boot process follows these stages to transition from BIOS/UEFI to a running 64-bit kernel:
+                BIOS → bootloader → protected mode → long mode → kernel
             </p>
 
             <h3>1. Multiboot Header</h3>
-            <p>
-                The OS uses a Multiboot2 header to be loaded by GRUB or compatible bootloaders:
-            </p>
+            <p>magic numbers so GRUB doesn't ignore us:</p>
             <pre><code>section .multiboot_header
 header_start:
-    dd 0xe85250d6    ; Multiboot2 magic number
-    dd 0             ; Protected mode i386
+    dd 0xe85250d6    ; multiboot2 magic
+    dd 0             ; i386
     dd header_end - header_start
     dd 0x100000000 - (0xe85250d6 + 0 + (header_end - header_start))
     
-    ; End tag
     dw 0
     dw 0
     dd 8
 header_end:</code></pre>
 
-            <h3>2. 32-bit Protected Mode Entry</h3>
-            <p>
-                The bootloader enters at the <code>start</code> label in 32-bit protected mode. The kernel 
-                performs several validation checks:
-            </p>
+            <h3>2. 32-bit Entry</h3>
+            <p>bootloader drops us in 32-bit mode. we check:</p>
             <ul>
-                <li><strong>Multiboot check:</strong> Verifies EAX contains the magic number <code>0x36d76289</code></li>
-                <li><strong>CPUID check:</strong> Tests if CPUID instruction is available</li>
-                <li><strong>Long mode check:</strong> Ensures CPU supports 64-bit mode via CPUID</li>
+                <li>multiboot magic is correct (EAX = 0x36d76289)</li>
+                <li>CPUID exists</li>
+                <li>CPU supports 64-bit</li>
             </ul>
+            <p>if any check fails we write "ERROR: X" to screen and halt forever</p>
 
-            <h3>3. Page Table Setup</h3>
-            <p>
-                Before enabling long mode, identity-mapped page tables are configured:
-            </p>
+            <h3>3. Page Tables</h3>
+            <p>map first 1GB identity (virt addr = phys addr):</p>
             <pre><code>setup_page_tables:
-    ; Link L4 -> L3
     mov eax, page_table_l3
-    or eax, 0b11    ; Present + Writable
+    or eax, 0b11
     mov [page_table_l4], eax
 
-    ; Link L3 -> L2
     mov eax, page_table_l2
     or eax, 0b11
     mov [page_table_l3], eax
 
-    ; Map first 1GB (512 * 2MB pages)
     mov ecx, 0
 .loop:
     mov eax, 0x200000
     mul ecx
-    or eax, 0b10000011  ; Present + Writable + Huge
+    or eax, 0b10000011
     mov [page_table_l2 + ecx * 8], eax
     inc ecx
     cmp ecx, 512
     jne .loop
     ret</code></pre>
 
-            <div class="info-box">
-                <h4>Why Identity Mapping?</h4>
-                <p>
-                    Identity mapping means virtual addresses equal physical addresses. This simplifies the 
-                    initial boot process since the kernel can execute without address translation confusion.
-                </p>
-            </div>
-
-            <h3>4. Enabling Paging & Long Mode</h3>
+            <h3>4. Enable Long Mode</h3>
             <pre><code>enable_paging:
-    ; Load CR3 with PML4 address
     mov eax, page_table_l4
     mov cr3, eax
 
-    ; Enable PAE (Physical Address Extension)
     mov eax, cr4
     or eax, 1 << 5
     mov cr4, eax
 
-    ; Set long mode bit in EFER MSR
     mov ecx, 0xC0000080
     rdmsr
     or eax, 1 << 8
     wrmsr
 
-    ; Enable paging in CR0
     mov eax, cr0
     or eax, 1 << 31
     mov cr0, eax
     ret</code></pre>
 
-            <h3>5. Jump to Long Mode</h3>
-            <p>
-                After loading the GDT64 with a 64-bit code segment, the kernel performs a far jump to 
-                transition into 64-bit long mode:
-            </p>
+            <h3>5. Jump to 64-bit</h3>
             <pre><code>lgdt [gdt64.pointer]
 jmp gdt64.code_segment:long_mode_start</code></pre>
 
-            <h3>6. Long Mode Entry Point</h3>
+            <h3>6. Long Mode</h3>
             <pre><code>bits 64
 long_mode_start:
-    ; Zero out segment registers
     mov ax, 0
     mov ss, ax
     mov ds, ax
@@ -539,7 +509,6 @@ long_mode_start:
     mov fs, ax
     mov gs, ax
 
-    ; Call C kernel
     call kernel_main
     hlt</code></pre>
         </section>
@@ -547,73 +516,55 @@ long_mode_start:
         <!-- Kernel Initialization Section -->
         <section id="kernel-init">
             <h2>Kernel Initialization</h2>
-            <p>
-                Once in 64-bit mode, the <code>kernel_main</code> function initializes all subsystems:
-            </p>
+            <p>once we're in 64-bit mode:</p>
 
-            <h3>Initialization Sequence</h3>
             <pre><code>void kernel_main(void) {
-    // 1. Initialize display
     print_clear();
     print_set_color(PRINT_COLOR_WHITE, PRINT_COLOR_BLACK);
-
-    // 2. Initialize disk
     disk_init();
-
-    // 3. Load or create filesystem
+    
     if (load_fs(100) != 0) {
-        // Start fresh if no saved FS
         print_str("No saved filesystem found. Starting fresh.");
     } else {
         print_str("Filesystem loaded from disk.");
     }
 
-    // 4. Initialize IDT and keyboard
     idt_init();
-
-    // 5. Show welcome screen with login
     show_welcome_screen();
 
-    // 6. Enter main loop
     while (1) {
         __asm__ volatile("hlt");
     }
 }</code></pre>
 
-            <h3>Subsystem Details</h3>
+            <h3>what happens</h3>
             <table>
                 <thead>
                     <tr>
-                        <th>Subsystem</th>
-                        <th>Function</th>
-                        <th>Purpose</th>
+                        <th>thing</th>
+                        <th>what it does</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Display</td>
-                        <td><code>print_clear()</code></td>
-                        <td>Initialize VGA text mode buffer at 0xB8000</td>
+                        <td>print_clear()</td>
+                        <td>clear VGA buffer (0xB8000)</td>
                     </tr>
                     <tr>
-                        <td>Disk</td>
-                        <td><code>disk_init()</code></td>
-                        <td>Initialize ATA/IDE disk driver</td>
+                        <td>disk_init()</td>
+                        <td>setup disk driver</td>
                     </tr>
                     <tr>
-                        <td>Filesystem</td>
-                        <td><code>load_fs(100)</code></td>
-                        <td>Load filesystem from LBA sector 100</td>
+                        <td>load_fs(100)</td>
+                        <td>load filesystem from sector 100</td>
                     </tr>
                     <tr>
-                        <td>Interrupts</td>
-                        <td><code>idt_init()</code></td>
-                        <td>Set up IDT and enable keyboard interrupts</td>
+                        <td>idt_init()</td>
+                        <td>setup interrupts for keyboard</td>
                     </tr>
                     <tr>
-                        <td>UI</td>
-                        <td><code>show_welcome_screen()</code></td>
-                        <td>Display ASCII art and login prompt</td>
+                        <td>show_welcome_screen()</td>
+                        <td>ASCII art + login</td>
                     </tr>
                 </tbody>
             </table>
@@ -623,50 +574,40 @@ long_mode_start:
         <section id="login-system">
             <h2>Login System</h2>
             <p>
-                PussyOS features a complete authentication system with configurable credentials stored in 
-                the filesystem.
+                login or get locked out
             </p>
 
-            <h3>Configuration File Format</h3>
-            <p>
-                Login credentials are stored in a file named <code>config</code> in the filesystem:
-            </p>
+            <h3>config file</h3>
+            <p>stored in filesystem as "config":</p>
             <pre><code>username. admin
 password. pass</code></pre>
 
             <div class="info-box warning">
-                <h4>Security Note</h4>
+                <h4>plaintext passwords</h4>
                 <p>
-                    The current implementation stores passwords in plaintext. This is suitable for a 
-                    learning/hobbyist OS but would require hashing (e.g., SHA-256) for any real-world use.
+                    yeah it's all plaintext. this is a hobby OS not a fucking bank
                 </p>
             </div>
 
-            <h3>Login Flow</h3>
+            <h3>how it works</h3>
             <ol>
-                <li><strong>Load config:</strong> Read credentials from <code>config</code> file (defaults to admin/pass if missing)</li>
-                <li><strong>Username prompt:</strong> User enters username</li>
-                <li><strong>Password prompt:</strong> User enters password (visible input)</li>
-                <li><strong>Validation:</strong> Compare inputs against stored credentials</li>
-                <li><strong>Success:</strong> Display boot animation and enter shell</li>
-                <li><strong>Failure:</strong> Decrement attempt counter, lock system after 3 failures</li>
+                <li>read config file (create with defaults if missing)</li>
+                <li>ask for username</li>
+                <li>ask for password</li>
+                <li>check if it matches</li>
+                <li>if yes: boot animation → shell</li>
+                <li>if no: try again (max 3 attempts)</li>
+                <li>3 failures = system halts forever</li>
             </ol>
 
-            <h3>Credential Parsing</h3>
-            <p>
-                The <code>load_credentials()</code> function parses the config file with these features:
-            </p>
+            <h3>parsing</h3>
             <ul>
-                <li>Strips leading and trailing whitespace</li>
-                <li>Expects format: <code>username. &lt;value&gt;</code> and <code>password. &lt;value&gt;</code></li>
-                <li>Falls back to defaults if file is missing or malformed</li>
-                <li>Creates config file with defaults if it doesn't exist</li>
+                <li>strips whitespace</li>
+                <li>reads "username. X" and "password. Y"</li>
+                <li>defaults to admin/pass if fucked</li>
             </ul>
 
-            <h3>Attempt Limiting</h3>
-            <p>
-                Users get 3 login attempts. After 3 failures, the system enters a locked state:
-            </p>
+            <h3>lockout</h3>
             <pre><code>if (login_attempts > 0) {
     print_str("Invalid credentials. Attempts remaining: ");
     print_int(login_attempts);
@@ -677,24 +618,21 @@ password. pass</code></pre>
         __asm__ volatile("hlt");
     }
 }</code></pre>
+            <p>after 3 tries you're done. CPU halts. reboot to try again</p>
         </section>
 
         <!-- Boot Animations Section -->
         <section id="animations">
             <h2>Boot Animations</h2>
-            <p>
-                PussyOS includes several animated sequences during boot to provide visual feedback and personality.
-            </p>
+            <p>animated shit for the vibes</p>
 
-            <h3>ASCII Art Logo</h3>
-            <p>
-                The OS logo is revealed line-by-line with typing animation:
-            </p>
+            <h3>ASCII Logo</h3>
+            <p>reveals line by line:</p>
             <pre><code>void reveal_logo() {
     char* logo_lines[] = {
         "8b,dPPYba,  88       88 ,adPPYba, ,adPPYba, 8b       d8  ",
         "88P'    \"8a 88       88 I8[    \"\" I8[    \"\" `8b     d8'  ",
-        // ... more lines ...
+        // ...
         "                                PussyOS v1.0 ",
         "========================================================"
     };
@@ -707,34 +645,27 @@ password. pass</code></pre>
 }</code></pre>
 
             <h3>Typing Effect</h3>
-            <p>
-                Text appears character-by-character with a calibrated delay:
-            </p>
+            <p>prints char by char with delay:</p>
             <pre><code>void type_text(char* text, uint8_t fg_color, uint8_t bg_color) {
     print_set_color(fg_color, bg_color);
     for (size_t i = 0;; i++) {
         char ch = text[i];
         if (ch == '\0') break;
         print_char(ch);
-        delay(2);  // Tuned for smooth typing speed
+        delay(2);
     }
 }</code></pre>
 
             <h3>Progress Bar</h3>
-            <p>
-                An animated progress bar shows system initialization:
-            </p>
+            <p>fills up with color pulse:</p>
             <pre><code>void animate_progress() {
     print_str("Initializing system... [");
     for (int progress = 0; progress <= 40; progress++) {
-        // Draw filled portion
         for (int j = 0; j < progress; j++) print_char('=');
-        // Draw empty portion
         for (int j = progress; j < 40; j++) print_char(' ');
         print_char(']');
-        print_char('\r');  // Carriage return to overwrite
+        print_char('\r');
         
-        // Color pulse effect
         uint8_t fg = (progress % 10 < 5) ? 
             PRINT_COLOR_MAGENTA : PRINT_COLOR_RED;
         print_set_color(fg, PRINT_COLOR_BLACK);
@@ -743,10 +674,8 @@ password. pass</code></pre>
     }
 }</code></pre>
 
-            <h3>Post-Login Sequence</h3>
-            <p>
-                After successful login, humorous loading messages display:
-            </p>
+            <h3>Post-Login Messages</h3>
+            <p>after successful login:</p>
             <pre><code>void fake_loading_sequence() {
     char* loading_msgs[] = {
         "Boobs are great...",
@@ -767,19 +696,14 @@ password. pass</code></pre>
     }
 }</code></pre>
 
-            <h3>Delay Calibration</h3>
-            <p>
-                The timing system uses a busy-loop with NOP instructions:
-            </p>
+            <h3>Timing</h3>
+            <p>busy loop with NOPs:</p>
             <pre><code>void delay(uint32_t units) {
     for (uint32_t i = 0; i < units * 100000; i++) {
         __asm__ volatile("nop");
     }
 }</code></pre>
-            <p>
-                The multiplier (100000) is calibrated for typical x86-64 clock speeds to produce 
-                visually pleasing animation timing.
-            </p>
+            <p>units * 100000 iterations. tune it til it looks right</p>
         </section>
 
     </main>
