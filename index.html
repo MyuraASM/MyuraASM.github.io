@@ -364,34 +364,45 @@
             </ul>
         </div>
 
+        
+
         <div class="nav-section">
             <div class="nav-section-title">Core Systems</div>
             <ul class="nav-links">
                 <li><a href="#login-system">Login System</a></li>
                 <li><a href="#shell">Shell & Commands</a></li>
-                <li><a href="#filesystem">Filesystem</a></li>
+                <li><a href="#disk-filesystem">Disk & Filesystem</a></li>
                 <li><a href="#display">Display & UI</a></li>
                 <li><a href="#interrupts">Interrupts & IDT</a></li>
+                <li><a href="#math-command">Math Command</a></li>
+<li><a href="#matrix-calculator">Matrix Calculator</a></li>
+<li><a href="#pci-browser">PCI Browser</a></li>
+<li><a href="#text-editor">Text Editor</a></li>
             </ul>
         </div>
 
-        <div class="nav-section">
-            <div class="nav-section-title">Boot Process</div>
-            <ul class="nav-links">
-                <li><a href="#multiboot">Multiboot2 Header</a></li>
-                <li><a href="#long-mode">Long Mode Setup</a></li>
-                <li><a href="#page-tables">Page Tables</a></li>
-            </ul>
+        
+
+       
+
+
         </div>
 
         <div class="nav-section">
-            <div class="nav-section-title">Features</div>
-            <ul class="nav-links">
-                <li><a href="#animations">Boot Animations</a></li>
-                <li><a href="#config">Configuration</a></li>
-                <li><a href="#security">Security Features</a></li>
-            </ul>
-        </div>
+    <div class="nav-section-title">Graphics & Games</div>
+    <ul class="nav-links">
+        <li><a href="#graphics">Graphical Programs</a></li>
+        <li><a href="#pong">Pong</a></li>
+        <li><a href="#snake">Snake</a></li>
+    </ul>
+</div>
+
+        <div class="nav-section">
+    <div class="nav-section-title">Scripting</div>
+    <ul class="nav-links">
+        <li><a href="#scripting">PussyLang & Brainfuck</a></li>
+    </ul>
+</div>
     </nav>
 
     <!-- Main Content -->
@@ -943,6 +954,149 @@ password. pass</code></pre>
             </table>
         </section>
 
+        <!-- Disk & Filesystem Section -->
+<section id="disk-filesystem">
+    <h2>Disk & Filesystem</h2>
+    <p>
+        Without storage,an OS is just a fancy calculator.
+    </p>
+
+    <h3>ATA PIO Disk Driver</h3>
+    <p>
+        The disk driver uses <strong>PIO (Programmed I/O)</strong> mode on the primary ATA channel
+        (I/O ports <code>0x1F0</code>–<code>0x1F7</code>). It's simple, it's slow, and it works
+        on almost all x86 hardware from the past 30 years. We only support LBA28 addressing,
+        so your disk can be up to 128GB 
+    </p>
+
+    <h4>Registers & Commands</h4>
+    <table>
+        <thead><tr><th>Port</th><th>Name</th><th>Use</th></tr></thead>
+        <tbody>
+            <tr><td><code>0x1F0</code></td><td>Data</td><td>Read/write data words (16‑bit)</td></tr>
+            <tr><td><code>0x1F1</code></td><td>Error</td><td>Error info after a failed command</td></tr>
+            <tr><td><code>0x1F2</code></td><td>Sector count</td><td>Number of sectors to transfer</td></tr>
+            <tr><td><code>0x1F3</code></td><td>LBA low</td><td>LBA bits 0–7</td></tr>
+            <tr><td><code>0x1F4</code></td><td>LBA mid</td><td>LBA bits 8–15</td></tr>
+            <tr><td><code>0x1F5</code></td><td>LBA high</td><td>LBA bits 16–23</td></tr>
+            <tr><td><code>0x1F6</code></td><td>Drive/head</td><td>Drive select (master/slave) + LBA bits 24–27</td></tr>
+            <tr><td><code>0x1F7</code></td><td>Command/Status</td><td>Write command, read status</td></tr>
+        </tbody>
+    </table>
+
+    <p>Common commands:</p>
+    <ul>
+        <li><code>0x20</code> – Read sectors (with retry)</li>
+        <li><code>0x30</code> – Write sectors (with retry)</li>
+    </ul>
+
+    <p>Status bits (read from <code>0x1F7</code>):</p>
+    <ul>
+        <li><code>0x80</code> – BSY (busy) – drive is busy, do not touch</li>
+        <li><code>0x40</code> – DRDY (drive ready) – ready for command</li>
+        <li><code>0x08</code> – DRQ (data request) – ready to transfer data</li>
+        <li><code>0x01</code> – ERR (error) – something went horribly wrong</li>
+    </ul>
+
+    <h4>Reading and Writing</h4>
+    <p>
+        The functions <code>disk_read_sector(lba, buffer)</code> and <code>disk_write_sector(lba, buffer)</code>
+       
+    </p>
+    <ul>
+        <li>Wait for drive to be not busy.</li>
+        <li>Write the LBA and sector count to the registers.</li>
+        <li>Send the command.</li>
+        <li>Wait for DRQ, then  256 words (512 bytes) in/out of the data port.</li>
+        <li>Check for errors and cry if necessary.</li>
+    </ul>
+    <p>
+        It's blocking, it's stupid, but it works. No DMA because we're not that cool.
+    </p>
+
+    <h3>Filesystem – A Simple In‑Memory FS</h3>
+    <p>
+        The filesystem is a flat, in‑memory structure. There are no real directories (just paths
+        with slashes), and everything lives in two global arrays: <code>files[]</code> and
+        <code>dirs[]</code>. It's like a <code>tar</code> file that never gets packed.
+    </p>
+
+    <h4>Limits (because we have to)</h4>
+    <ul>
+        <li><strong>Max files:</strong> 128</li>
+        <li><strong>Max directories:</strong> 64</li>
+        <li><strong>Filename length:</strong> 32 characters (full path up to 256)</li>
+        <li><strong>File content size:</strong> 4096 bytes </li>
+    </ul>
+
+    <h4>Path Resolution</h4>
+    <p>
+        The function <code>resolve_path(path, full_path)</code> takes a relative path (like
+        <code>"docs/note.txt"</code>) and prepends the current prefix (stored in
+        <code>current_prefix</code>). It also handles <code>..</code> and <code>.</code> in the most
+        naive way possible
+    </p>
+
+    <h4>File Operations</h4>
+    <ul>
+        <li><code>mkfile(name)</code> – creates an empty file (fails if exists).</li>
+        <li><code>write_to_file(name, text)</code> – overwrites file with given text (truncates).</li>
+        <li><code>cat_file(name)</code> – prints file content to screen.</li>
+        <li><code>rm_file(name)</code> – deletes a file (actually just marks it as unused  we don't zero it cuz whatever).</li>
+    </ul>
+
+    <h4>Directory Operations</h4>
+    <ul>
+        <li><code>mkdir_cmd(name)</code> – creates a directory entry (just a name, doesn't actually contain files).</li>
+        <li><code>rmdir_cmd(name)</code> – removes a directory if empty (by our definition: no files have that prefix).</li>
+        <li><code>ls_current()</code> – lists files and directories in the current prefix.</li>
+    </ul>
+
+    <h4>Saving & Loading to Disk</h4>
+    <p>
+        The whole filesystem can be serialized to disk starting at a given LBA (default 100).
+        <code>save_fs(lba)</code> writes all file and directory structures to consecutive sectors.
+        <code>load_fs(lba)</code> reads them back. This is how your files survive a reboot.
+        The format is simple: a header with magic numbers, then arrays of file/directory structs.
+        
+    </p>
+
+    <h4>Custom String Functions</h4>
+    <p>
+        Since we don't have a libc, we rolled our own string functions. 
+    </p>
+    <ul>
+        <li><code>kstrlen</code> – counts characters until a null. Revolutionary.</li>
+        <li><code>kstrcmp</code> / <code>kstrncmp</code> – compare strings, case‑sensitive because we're not animals.</li>
+        <li><code>kstrncpy</code> – copy with a limit (and always null‑terminates because we're nice).</li>
+        <li><code>kstrncat</code> – concatenate with a bound (doesn't check overlap, don't be dumb).</li>
+        <li><code>kstrchr</code> – find a character in a string (returns <code>NULL</code> if not found, like your social life).</li>
+    </ul>
+
+    <div class="info-box warning">
+        <h4>⚠️ Data Safety ⚠️</h4>
+        <p>
+            The filesystem lives in RAM until you explicitly save it with <code>savefs</code>.
+            If you power off without saving, your files go to the CIA.
+            Also, writing to disk directly via <code>disk_write_sector</code> can corrupt your
+            filesystem if you're not careful. You have been warned.
+        </p>
+    </div>
+
+    <h4>Under the Hood: File Lookup</h4>
+    <p>
+        Finding a file is a linear scan through <code>files[]</code> comparing full paths.
+        It's O(n), n ≤ 128, so it's fine. Directories are just markers; they don't hold content.
+        The current prefix (<code>current_prefix</code>) is a string like <code>"/home/user/"</code>,
+        updated by <code>cd</code>. All paths are absolute internally; relative paths are expanded
+        by <code>resolve_path</code>.
+    </p>
+
+    <p>
+       
+    </p>
+</section>
+
 int ui_is_in_terminal_area(int column) {
     return column < TERMINAL_WIDTH;
 }</code></pre>
@@ -1020,6 +1174,598 @@ int ui_is_in_terminal_area(int column) {
             </ul>
             <p>mask: enable only keyboard (0xFD = all off except bit 1)</p>
         </section>
+
+
+        <!-- Math Command Section -->
+<section id="math-command">
+    <h2>Math Command</h2>
+    <p>
+        The <code>math</code> command turns the shell into a feature‑packed integer calculator.
+        It supports arithmetic, bitwise operations, comparisons, and various unary functions.
+    </p>
+
+    <h3>Syntax</h3>
+    <pre><code>math &lt;operation&gt; [arg1] [arg2]</code></pre>
+    <p>
+        Most operations take two arguments; unary ones (like <code>abs</code>, <code>sqrt</code>) take one.
+        Arguments are integers (decimal). Negative numbers are allowed.
+    </p>
+
+    <h3>Supported Operations</h3>
+    <table>
+        <thead><tr><th>Category</th><th>Ops</th><th>Description</th></tr></thead>
+        <tbody>
+            <tr><td>Arithmetic</td><td>add, sub, mul, div, mod, pow</td><td>+, -, ×, ÷, %, power</td></tr>
+            <tr><td>Bitwise</td><td>and, or, xor, not, shl, shr</td><td>&, |, ^, ~, <<, >></td></tr>
+            <tr><td>Comparisons</td><td>eq, ne, lt, gt, le, ge</td><td>==, !=, &lt;, &gt;, ≤, ≥ (returns 1/0)</td></tr>
+            <tr><td>Unary</td><td>abs, neg, sqrt, log2, bits, revb, fact, fib</td><td>absolute, negate, integer sqrt, floor log2, popcount, bit reverse, factorial, Fibonacci</td></tr>
+            <tr><td>Other</td><td>gcd, lcm, max, min</td><td>greatest common divisor, least common multiple, maximum, minimum</td></tr>
+        </tbody>
+    </table>
+
+    <h4>Examples</h4>
+    <pre><code>> math add 5 3
+8
+> math pow 2 10
+1024
+> math and 12 5
+4
+> math sqrt 16
+4
+> math fib 10
+55</code></pre>
+
+    <h3>Implementation Snapshot</h3>
+    <p>
+        The command parses the input by extracting the operation and up to two numbers.
+        It uses helper functions like <code>atoi()</code> and <code>copy_until_space()</code>.
+        Overflow is checked where necessary (e.g., multiplication, factorial, power).
+        Unary operations are detected when the second argument is missing.
+        Results are printed via <code>print_int()</code>.
+    </p>
+
+    <p>A minimal version of the dispatcher looks like this:</p>
+    <pre><code>void process_math(const char* expr) {
+    char op[8], num1[16], num2[16];
+    extract_op_and_numbers(expr, op, num1, num2);
+
+    int a = atoi(num1), b = atoi(num2);
+    int is_unary = (num2[0] == '\0');
+
+    if (strcmp(op, "add") == 0)      print_int(a + b);
+    else if (strcmp(op, "sqrt") == 0) print_int(int_sqrt(a));
+    // ... handle all other ops
+}</code></pre>
+    <p>
+        The full implementation includes about 30 operations, each with proper error handling
+        (division by zero, negative square root, overflow, etc.).
+    </p>
+</section>
+
+
+<!-- Matrix Calculator Section -->
+<section id="matrix-calculator">
+    <h2>Matrix Calculator</h2>
+    <p>
+        An interactive TUI application for matrix operations. Launch it with the <code>matrix</code> command.
+        It lets you edit two matrices, choose an operation (multiply, add, subtract), and see the result immediately.
+    </p>
+
+    <h3>Controls</h3>
+    <table>
+        <thead><tr><th>Key</th><th>Action</th></tr></thead>
+        <tbody>
+            <tr><td>Arrow keys</td><td>Navigate cells</td></tr>
+            <tr><td>F1 / F2</td><td>Switch between Matrix A and Matrix B</td></tr>
+            <tr><td>Enter</td><td>Edit the current cell</td></tr>
+            <tr><td>M / A / S</td><td>Change operation: Multiply / Add / Subtract</td></tr>
+            <tr><td>Space</td><td>Calculate and show result</td></tr>
+            <tr><td>+ / -</td><td>Increase / decrease matrix size (up to 6x6)</td></tr>
+            <tr><td>ESC</td><td>Exit back to shell</td></tr>
+        </tbody>
+    </table>
+
+    <h3>Features</h3>
+    <ul>
+        <li>Two independent matrices (A and B), each up to 6×6.</li>
+        <li>Real‑time cell editing with a simple number input line.</li>
+        <li>Automatic dimension validation for each operation.</li>
+        <li>Result matrix displayed with proper brackets and alignment.</li>
+        <li>Color‑coded UI: selected matrix in cyan, current cell highlighted.</li>
+    </ul>
+
+    <h4>Screenshot (ASCII simulation)</h4>
+    <pre><code>                    MATRIX CALCULATOR
+
+Matrix A [2x2]          Matrix B [2x2]
+[ 1  0 ]                [ 2  0 ]
+[ 0  1 ]                [ 0  2 ]
+
+Operation: [*MULTIPLY]  +ADD  -SUB
+Press M/A/S to change, SPACE to calculate
+
+Result = [2x2]
+[ 2  0 ]
+[ 0  2 ]</code></pre>
+
+    <h3>Implementation Overview</h3>
+    <p>
+        The calculator runs in its own loop, capturing keyboard input and redrawing the screen.
+        It uses the VGA text buffer directly for fast rendering. Matrices are stored as 2D integer arrays.
+        The core operation functions (<code>matrix_multiply</code>, <code>matrix_add</code>, <code>matrix_subtract</code>)
+        perform the calculations with simple nested loops.
+    </p>
+
+    <p>Multiplication snippet:</p>
+    <pre><code>void matrix_multiply(void) {
+    if (cols_a != rows_b) {
+        result_valid = 0;
+        return;
+    }
+    for (int r = 0; r < rows_a; r++) {
+        for (int c = 0; c < cols_b; c++) {
+            int sum = 0;
+            for (int k = 0; k < cols_a; k++) {
+                sum += matrix_a[r][k] * matrix_b[k][c];
+            }
+            matrix_result[r][c] = sum;
+        }
+    }
+    result_valid = 1;
+}</code></pre>
+    <p>
+        The UI adapts to screen size – if matrices would overlap horizontally, they are stacked vertically.
+        All drawing is done by writing directly to the VGA buffer at <code>0xB8000</code>.
+    </p>
+</section>
+
+<!-- PCI Browser Section -->
+<section id="pci-browser">
+    <h2>PCI Browser</h2>
+    <p>
+        Ever wondered what’s lurking inside your computer? The <code>pciscan</code> command dumps raw PCI info,
+        but if you want to <em>feel</em> the hardware – touch it, poke it, scroll through its secrets –
+        fire up the <strong>PCI Browser</strong> with <code>pcibrowse</code> (or just <code>pci</code> if you're lazy).
+    </p>
+
+    <p>
+        This interactive tool scans all 256 buses, 32 devices per bus, and up to 8 functions per device,
+        then presents them in a friendly list. Select a device, hit Enter, and dive into its configuration space.
+        You'll see vendor/device IDs, class codes, BARs (Base Address Registers) with their decoded sizes,
+        interrupt lines, bridge details, and even the raw command/status bits.
+    </p>
+
+    <h3>Why you need this</h3>
+    <ul>
+        <li> U prob dont</li>
+        
+    </ul>
+
+    <h3>Controls</h3>
+    <table>
+        <thead><tr><th>Key</th><th>Action</th></tr></thead>
+        <tbody>
+            <tr><td><kbd>↑</kbd> / <kbd>↓</kbd></td><td>Navigate device list / scroll details</td></tr>
+            <tr><td><kbd>Enter</kbd></td><td>View full device details (or go back to list)</td></tr>
+            <tr><td><kbd>R</kbd></td><td>Rescan PCI buses (handy if you hot‑plugged something... not that we support that)</td></tr>
+            <tr><td><kbd>ESC</kbd></td><td>Back to the shell, you hardware pervert</td></tr>
+        </tbody>
+    </table>
+
+    <h3>What you'll see</h3>
+    <p>
+        The details screen  It shows:
+    </p>
+    <ul>
+        <li><strong>Identification:</strong> Bus:Device.Function, vendor name (Intel, AMD, etc.), device ID, revision, subsystem IDs.</li>
+        <li><strong>Class info:</strong> Like "Mass Storage Controller / SATA / AHCI" – decoded from class, subclass, and programming interface.</li>
+        <li><strong>Command & Status registers:</strong> Whether I/O space, memory space, bus mastering are enabled  the little switches that make hardware tick.</li>
+        <li><strong>Interrupts:</strong> IRQ line and pin (if any).</li>
+        <li><strong>BARs:</strong> All six Base Address Registers, decoded: memory or I/O, 32/64‑bit, prefetchable, and the actual size in bytes/KB/MB. Yes, we compute the size by writing all ones and reading back  pure PCI cinema.</li>
+        <li><strong>Bridge info:</strong> If it's a PCI‑to‑PCI bridge, you get primary/secondary/subordinate bus numbers.</li>
+        
+    </ul>
+
+    <div class="info-box">
+        <h4>Sex tip</h4>
+        <p>
+            Run this on a real machine, not just QEMU. Real hardware has weird devices with broken BARs,
+            mysterious vendor IDs, and sometimes devices that don't exist but claim they do cuz they fucking jews or sum shit.
+            BECAUSE CIA HAS FUCKING CONTROLED EVERYONE FUCKING DUMBASS PPL OMGOMGOMGOGMOGM
+        </p>
+    </div>
+</section>
+
+<!-- Text Editor Section -->
+<section id="text-editor">
+    <h2>Text Editor – <code>edit</code></h2>
+    <p>
+        Because sometimes you need to write something down without leaving your precious PussyOS.
+        The built‑in text editor is a simple, full‑screen editor for plain text files.
+        It's like Notepad, but better.
+    </p>
+
+    <h3>Interface</h3>
+    <ul>
+        <li><strong>Editing area:</strong> 80 columns × 23 rows – your canvas.</li>
+        <li><strong>Status bar (row 23):</strong> Shows filename, modified flag, selection indicator, line/column numbers.</li>
+        <li><strong>Help bar (row 24):</strong> Lists the most important key bindings (so you don't have to memorise them like a caveman).</li>
+        <li><strong>Cursor:</strong> A blinking (well, not really blinking) underscore that shows where you're about to insert whatever u want.</li>
+    </ul>
+
+    <h3>Features</h3>
+    <h4>Basic Editing</h4>
+    <ul>
+        <li>Arrow keys to move around.</li>
+        <li><kbd>Enter</kbd> to insert a newline.</li>
+        <li><kbd>Backspace</kbd> to delete the character before the cursor.</li>
+        <li>Typing anything else inserts it at the cursor. Yes, even symbols.</li>
+        <li>Tabs are expanded to 4 spaces because real programmers use spaces.</li>
+    </ul>
+
+    <h4>Selection & Clipboard</h4>
+    <ul>
+        <li><kbd>Ctrl+Space</kbd> – start selection (move cursor to expand). Press again to cancel.</li>
+        <li><kbd>Ctrl+C</kbd> – copy selected text to internal clipboard.</li>
+        <li><kbd>Ctrl+V</kbd> – paste clipboard content at cursor.</li>
+        <li><kbd>Ctrl+K</kbd> – cut selected text (copy + delete).</li>
+    </ul>
+    <p>
+        The clipboard is a global buffer of up to 2048 bytes  enough for a few lines of code,
+        not enough for your entire furry novels.
+    </p>
+
+    <h4>Undo</h4>
+    <ul>
+        <li><kbd>Ctrl+Z</kbd> – undo the last change. Yes, only one level. We're not made of memory.</li>
+        <li>Undo saves the entire buffer state before each modification. </li>
+    </ul>
+
+    <h4>File Operations</h4>
+    <ul>
+        <li><kbd>Ctrl+S</kbd> – save the current buffer to the filesystem (overwrites existing file or creates new one).</li>
+        <li><kbd>Ctrl+X</kbd> – exit the editor (if you haven't saved, your changes are lost  we warned you).</li>
+    </ul>
+    <p>
+        Files are stored in the same flat filesystem as everything else, with a maximum size of 4096 bytes.
+       
+    </p>
+
+    <h3>Implementation Secrets</h3>
+    <p>
+        The editor stores the entire text in a single linear buffer (<code>text_buffer[]</code>) of
+        <code>EDIT_WIDTH * EDIT_HEIGHT</code> bytes (80×23 = 1840 bytes). Yes, you can't have more text
+        than fits on the screen – it's a feature, not a bug. Lines are separated by <code>\n</code>;
+        there's no word wrap, no right margin, no mercy.
+    </p>
+    <p>
+        Cursor movement and rendering are done by scanning the buffer from the start to find line starts
+        and column positions. It's O(n) per keystroke, but n is small (≤ 1840), so it's fine.
+        The selection is stored as two positions (start and end) and rendered by checking each character
+        on the fly.
+    </p>
+    <p>
+        The undo system keeps a full copy of the buffer before each modification. That's why you only get
+        one undo – we're not Google Docs. The clipboard is also a simple byte array.
+    </p>
+    <p>
+        All key handling is done by reading raw scancodes from the keyboard controller and mapping them
+        to characters. <kbd>Ctrl</kbd> combinations are detected by tracking the left control key.
+        It's not perfect (right Ctrl won't work), but it's enough for a kernel editor.
+    </p>
+
+    <div class="info-box warning">
+        <h4>⚠️ Don't Blame Us Blame on the jews! ⚠️</h4>
+        <p>
+            If you <kbd>Ctrl+X</kbd> without saving, your changes are gone. Poof. No "Save changes?"
+            dialog. We believe in you taking responsibility for your actions. Also, the buffer is limited
+            to 1840 characters  if you type more, it will silently ignore further input. So count your words.
+        </p>
+    </div>
+
+    <p>
+        Despite its limitations, this editor is perfect for quick config tweaks, writing brainfuck programs,
+        or composing passive‑aggressive notes to yourself. It's <em>your</em> editor, in <em>your</em> OS.
+        Love it or leave it (literally, with Ctrl+X).
+    </p>
+</section>
+
+<!-- Scripting Languages Section -->
+<section id="scripting">
+    <h2>Scripting Languages</h2>
+    <p>
+        PussyOS includes two built‑in scripting languages: <strong>PussyLang</strong> (a custom language with variables,
+        lists, functions, and even graphics) and a numeric variant of <strong>Brainfuck</strong>. Both can be used
+        interactively or from files, and they integrate with the filesystem and display.
+    </p>
+
+    <!-- PussyLang Subsection -->
+    <h3>PussyLang</h3>
+    <p>
+        PussyLang is a simple, line‑oriented scripting language designed for quick automation, interactive input,
+        and direct screen manipulation. Script files use the extension <code>.p</code> or <code>.pussy</code>.
+        Launch a script with <code>pussy &lt;file&gt;</code>.
+    </p>
+
+    <h4>Variables</h4>
+    <ul>
+        <li>Names start with <code>$</code> (e.g., <code>$count</code>).</li>
+        <li>Automatically typed as number or string based on content.</li>
+        <li>Arithmetic: <code>add $var 5</code>, <code>sub $var 3</code>.</li>
+        <li>String concatenation is done via variable expansion inside quoted strings.</li>
+    </ul>
+    <pre><code>set $name "Alice"
+say "Hello, $name!"    # prints "Hello, Alice!"</code></pre>
+
+    <h4>Lists</h4>
+    <p>Lists can hold multiple values and support dynamic operations.</p>
+    <table>
+        <thead><tr><th>Command</th><th>Description</th></tr></thead>
+        <tbody>
+            <tr><td><code>list $lst</code></td><td>Create an empty list</td></tr>
+            <tr><td><code>push $lst "item"</code></td><td>Append an item</td></tr>
+            <tr><td><code>get $lst 0</code></td><td>Get item at index (stores in <code>$result</code>)</td></tr>
+            <tr><td><code>setat $lst 1 "new"</code></td><td>Set item at index</td></tr>
+            <tr><td><code>remove $lst 2</code></td><td>Remove item at index</td></tr>
+            <tr><td><code>pop $lst</code></td><td>Remove last item</td></tr>
+            <tr><td><code>size $lst</code></td><td>Get list size (stores in <code>$result</code>)</td></tr>
+            <tr><td><code>clear $lst</code></td><td>Empty the list</td></tr>
+        </tbody>
+    </table>
+
+    <h4>Control Flow</h4>
+    <ul>
+        <li><code>if $x == 5 { ... }</code> – condition with <code>==</code>, <code>!=</code>, <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code>.</li>
+        <li><code>while $i &lt; 10 { ... }</code> – loop while condition holds (max 10000 iterations).</li>
+        <li><code>loop 5 { ... }</code> – repeat block a fixed number of times.</li>
+    </ul>
+
+    <h4>Functions</h4>
+    <p>Define reusable blocks with parameters and return values.</p>
+    <pre><code>func $add $a $b {
+    set $result $a + $b
+    return $result
+}
+call $add 3 4
+say $result   # prints 7</code></pre>
+
+    <h4>Input / Output</h4>
+    <ul>
+        <li><code>say "text"</code> – print text (adds newline).</li>
+        <li><code>sayinline "text"</code> – print without newline.</li>
+        <li><code>input $var</code> – read a line from keyboard into a variable (interactive).</li>
+        <li><code>getkey $var</code> – store last pressed scancode (non‑blocking).</li>
+        <li><code>waitkey $var</code> – wait for a key and store its scancode.</li>
+        <li><code>outfile "name.txt"</code> – redirect all subsequent <code>say</code> output to a file.</li>
+    </ul>
+
+    <h4>Graphics Commands</h4>
+    <p>PussyLang can draw directly to the VGA text buffer using colour codes (0–15).</p>
+    <table>
+        <thead><tr><th>Command</th><th>Description</th></tr></thead>
+        <tbody>
+            <tr><td><code>pixel X Y COLOR</code></td><td>Draw a solid block at (X,Y) with given colour.</td></tr>
+            <tr><td><code>pixelchar X Y CHAR COLOR</code></td><td>Draw a custom ASCII character (code) at (X,Y).</td></tr>
+            <tr><td><code>rect X Y W H COLOR</code></td><td>Draw a filled rectangle.</td></tr>
+            <tr><td><code>line X1 Y1 X2 Y2 COLOR</code></td><td>Draw horizontal or vertical line.</td></tr>
+            <tr><td><code>clearscreen [COLOR]</code></td><td>Clear screen with optional background colour.</td></tr>
+        </tbody>
+    </table>
+
+    <h4>Other Commands</h4>
+    <ul>
+        <li><code>sleep MS</code> – crude busy‑wait delay.</li>
+        <li><code>cmd "shell command"</code> – execute an OS shell command.</li>
+        <li><code>bitand $a $b</code> – bitwise AND (result in <code>$result</code>).</li>
+    </ul>
+
+    <h4>Example: Countdown</h4>
+    <pre><code>set $i 10
+while $i > 0 {
+    say "$i ..."
+    sub $i 1
+}
+say "Blast off!"</code></pre>
+
+    <h4>Interactive Mode</h4>
+    <p>
+        When a script is run, it enters a special full‑screen interactive mode. The output area shows
+        script output, and you can scroll with arrow keys. The script can prompt for input, and you
+        can press <kbd>ESC</kbd> at any time to abort.
+    </p>
+
+    <!-- Brainfuck Subsection -->
+    <h3>Numeric Brainfuck</h3>
+    <p>
+        The classic Brainfuck language is implemented using <strong>numbers 0–7</strong> instead of symbols.
+        This makes it easier to type and embed in scripts. Use the command <code>bf &lt;file&gt;</code> to run
+        a Brainfuck program (file may contain any characters; only digits 0–7 are interpreted).
+    </p>
+
+    <h4>Instruction Mapping</h4>
+    <table>
+        <thead><tr><th>Digit</th><th>Brainfuck</th><th>Action</th></tr></thead>
+        <tbody>
+            <tr><td>0</td><td><code>&gt;</code></td><td>Move pointer right</td></tr>
+            <tr><td>1</td><td><code>&lt;</code></td><td>Move pointer left</td></tr>
+            <tr><td>2</td><td><code>+</code></td><td>Increment current cell</td></tr>
+            <tr><td>3</td><td><code>-</code></td><td>Decrement current cell</td></tr>
+            <tr><td>4</td><td><code>.</code></td><td>Output current cell as character</td></tr>
+            <tr><td>5</td><td><code>,</code></td><td>Input character into current cell</td></tr>
+            <tr><td>6</td><td><code>[</code></td><td>Jump forward past matching <code>]</code> if cell == 0</td></tr>
+            <tr><td>7</td><td><code>]</code></td><td>Jump back to matching <code>[</code> if cell != 0</td></tr>
+        </tbody>
+    </table>
+
+    <h4>Implementation Details</h4>
+    <ul>
+        <li>Tape size: 30,000 cells (wraps around).</li>
+        <li>Loop nesting depth limited to 256.</li>
+        <li>Maximum 10 million instructions to prevent infinite loops.</li>
+        <li>Bracket matching is pre‑computed for O(1) jumps.</li>
+        <li>Input waits for a key press and returns the ASCII character.</li>
+    </ul>
+
+    <h4>Example: Hello World</h4>
+    <p>Standard Brainfuck "Hello World!" translated to numeric:</p>
+    <pre><code>++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.</code></pre>
+    <p>Becomes (excerpt):</p>
+    <pre><code>22222222226702222222022222222222022202222012222223602244022402222222244022440224022440224402240220224440244022440224402222222224402440224402224403333333330333333334024</code></pre>
+
+    <div class="info-box">
+        <h4>Note</h4>
+        <p>
+            Both languages save their output to the file <code>output.txt</code> in the current directory
+            after execution (unless a different name is set with <code>outfile</code> in PussyLang).
+        </p>
+    </div>
+</section>
+
+<!-- Graphical Programs Section -->
+<section id="graphics">
+    <h2>Graphical Programs</h2>
+    <p>
+        Because numbers are boring and text is for poets or sum shit ykkyky. Here's some pretty (and not so pretty) stuff you can do.
+    </p>
+
+    <h3>graph – Interactive Graphing Calculator</h3>
+    <p>
+        <code>graph</code> lets you plot functions in real‑time. Move a cursor around with <kbd>WASD</kbd>, see coordinates update live.
+        Switch between sin, cos, parabola, cubic, circle, and your own custom functions (press <kbd>F</kbd> to type one).
+        Zoom with <kbd>+</kbd>/<kbd>-</kbd>, pan with arrow keys. It’s like math, but you can actually see it.
+    </p>
+
+    <h3>3d – 3D Shape Visualizer</h3>
+    <p>
+        <code>3d</code> renders wireframe 3D shapes using fixed‑point math and two‑pixel‑high characters.
+        Choose from cube, sphere, torus, cone, cylinder, star. Auto‑rotate or manually rotate with arrow keys.
+        It’s like having a tiny graphics card in your brain. Or a seizure. Your call.
+    </p>
+
+    <h3>3dgame – Walking Simulator / Shooter</h3>
+    <p>
+        <code>3dgame</code> is a real‑time 3D first‑person shooter. Kill red zombies and blue ghosts with <kbd>SPACE</kbd>.
+        Collect health packs (<span style="color:#0A0;">♥</span>) to survive. Wave‑based, multiplier for quick kills.
+        Move with <kbd>WASD</kbd>, turn with arrows. If you die, press <kbd>R</kbd> to restart.
+        It’s janky, it’s slow, it’s written in C with no GPU but it’s <em>our</em> jank.
+    </p>
+
+    <h3>draw – Pixel Editor</h3>
+<p>
+    <code>draw [filename]</code> opens a full‑screen 80×22 pixel editor. Move with arrows, draw with <kbd>SPACE</kbd>,
+    erase with <kbd>X</kbd>, fill with <kbd>F</kbd>. Pick colors from the palette at the bottom (numbers 1‑0 or <kbd>+</kbd>/<kbd>-</kbd>).
+    Save with <kbd>S</kbd>, load with <kbd>L</kbd>. Files are stored in the filesystem with a <code>DRAW:</code> header.
+    Great for making pixel art that nobody will ever see. <em>Just like your feelings or even this fucking OS.</em>
+</p>
+
+<h4>Interface</h4>
+<ul>
+    <li><strong>Canvas:</strong> 80 columns × 22 rows of “pixels” – each a full block character (<code>█</code>) in one of 16 VGA colors.</li>
+    <li><strong>Palette bar (row 22):</strong> Shows all 16 colors as blocks. The selected color is highlighted with brackets <code>[ ]</code>.</li>
+    <li><strong>Status bar (row 23):</strong> Displays current mode (DRAW/ERASE/FILL) and color name (e.g. “Light Red”).</li>
+    <li><strong>Control bar (row 24):</strong> Lists all keyboard shortcuts.</li>
+    <li><strong>Cursor:</strong> A bright <code>+</code> sign on the current cell, showing your pen color as background.</li>
+</ul>
+
+<h4>Modes</h4>
+<ul>
+    <li><strong>Draw (SPACE):</strong> Paints the current cell with the selected color.</li>
+    <li><strong>Erase (X):</strong> Sets the current cell to black (color 0).</li>
+    <li><strong>Fill (F):</strong> Flood‑fills the contiguous area of the same color with the current pen color. Uses a non‑recursive queue to avoid stack overflows – because recursion is for people who trust their stack.</li>
+</ul>
+
+<h4>File Format</h4>
+<p>
+    Saved files begin with the magic string <code>DRAW:</code> followed by the canvas data encoded as hexadecimal bytes
+    (two hex digits per pixel, row‑major order). This keeps the files small-ish and human‑readable if you're into that kind of thing.
+    Example: <code>DRAW:00FF0A...</code> – first pixel black, second white, third green… you get it.
+</p>
+
+<p class="info-box" style="margin-top:1rem;">
+    <strong>Mega pro chad tip:</strong> You can draw something truly awful, save it, and then <code>show [filename]</code> to display it
+    full‑screen later. Perfect for leaving threatening ASCII art for the next user.
+</p>
+
+    <p class="info-box" style="margin-top:2rem;">
+        All graphical programs temporarily take over the screen. Press <kbd>ESC</kbd> to return to the shell.
+        They use the VGA text buffer as a crude pixel grid – each character cell is one “pixel” (full block █).
+        Colors are the standard 16 VGA palette. It’s ugly, it’s limited, and we love it.
+    </p>
+</section>
+
+<!-- Games Section -->
+<section id="games">
+    <h2>Games</h2>
+    <p>
+        Because work is boring and you deserve to waste time in your own operating system.
+        Here's some classic arcade garbage.
+    </p>
+
+    <!-- Pong -->
+    <h3 id="pong">pong – The Original</h3>
+    <p>
+        <code>pong</code> brings the 1972 classic to your terminal. Two paddles, one ball,
+        endless arguments over who sucks more.
+    </p>
+
+    <h4>Features</h4>
+    <ul>
+        <li>Two‑player local – because you have no friends online.</li>
+        <li>Trail effect: the ball leaves a fading ghost, so you can see where you fucked up.</li>
+        <li>Paddle angle: hit the ball with the edge of the paddle to send it diagonal.
+            The game calculates the zone and makes you feel skilled.</li>
+        <li>Score limit: first to 5 wins. Then it shows a smug message.</li>
+    </ul>
+
+    <h4>Controls</h4>
+    <ul>
+        <li><kbd>W</kbd> / <kbd>S</kbd> – left paddle (Player 1)</li>
+        <li><kbd>↑</kbd> / <kbd>↓</kbd> – right paddle (Player 2)</li>
+        <li><kbd>R</kbd> – restart after game over</li>
+        <li><kbd>ESC</kbd> – rage quit back to shell</li>
+    </ul>
+
+    <p>
+        The ball speed is tied to a stupid busyloop counter, so it might run faster on
+        real hardware. Blame the lack of a scheduler and def  not me.
+    </p>
+
+    <!-- Snake -->
+    <h3 id="snake">snake – Eat, Grow, Die</h3>
+    <p>
+        <code>snake</code> is the classic Nokia‑era time waster. Guide the snake to the red food,
+        don't hit the walls, don't bite yourself. Simple. Except when the AI does it better.
+    </p>
+
+    <h4>Features</h4>
+    <ul>
+        <li>Manual mode: you drive. You'll crash. It's fine.</li>
+        <li><strong>AI mode:</strong> press <kbd>K</kbd> to let the computer play.
+            It's an aggressive little bastard – goes straight for the food and only swerves
+            at the last second to avoid its own body. It's still dumber than a trump supporter, but it tries unlike them.</li>
+        <li>Score counter: 10 points per food. Show off to nobody.</li>
+        <li>Speed changes depending on direction (horizontal is faster because fuck you).</li>
+    </ul>
+
+    <h4>Controls</h4>
+    <ul>
+        <li><kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> – move (manual mode)</li>
+        <li><kbd>K</kbd> – toggle AI on/off (the snake turns cyan when possessed)</li>
+        <li><kbd>R</kbd> – restart after you inevitably die</li>
+        <li><kbd>ESC</kbd> – abandon hope</li>
+    </ul>
+
+    <p class="info-box" style="margin-top:1rem;">
+        <strong>Pro tip:</strong> Watch the AI play for a while. It's hypnotic.
+        Then realise it's better than you. Then cry. Then press <kbd>K</kbd> and prove it wrong by driving into a wall immediately.
+        Ah, sweet white superiority.
+    </p>
+
+    <p>
+        Also, <code>3dgame</code> (under <a href="#graphics">Graphical Programs</a>) is technically a game too –
+        a first‑person shooter with waves of enemies. Go kill stuff if you're bored of rectangles.
+    </p>
+</section>
 
     </main>
 
