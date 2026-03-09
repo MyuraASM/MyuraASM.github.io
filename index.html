@@ -1,1 +1,1190 @@
 
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>PussyOS Documentation</title>
+    <style>
+      body {
+        background: #ffffff;
+        color: #000000;
+        font-family:
+          Times New Roman,
+          Times,
+          serif;
+        font-size: 14px;
+        line-height: 1.5;
+        margin: 0;
+        padding: 0;
+      }
+
+      .top-strip {
+        background: #c4567a;
+        height: 4px;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .sidebar {
+        padding: 20px 12px 40px;
+        border-right: 1px solid #c4567a;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 12px;
+      }
+
+      .logo {
+        font-size: 14px;
+        font-weight: bold;
+        color: #c4567a;
+        margin-bottom: 0;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      .logo-sub {
+        font-size: 11px;
+        color: #888888;
+        margin-bottom: 16px;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      .nav-label {
+        font-size: 11px;
+        font-weight: bold;
+        color: #000000;
+        margin: 14px 0 3px;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      .sidebar a {
+        display: block;
+        padding: 1px 4px;
+        color: #c4567a;
+        text-decoration: none;
+        font-size: 12px;
+      }
+
+      .sidebar a:hover {
+        text-decoration: underline;
+      }
+
+      .content {
+        padding: 24px 36px 60px;
+        max-width: 700px;
+      }
+
+      h1 {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 22px;
+        font-weight: bold;
+        color: #000000;
+        margin-bottom: 4px;
+        border-bottom: 2px solid #c4567a;
+        padding-bottom: 6px;
+      }
+
+      h1 em {
+        font-style: normal;
+        color: #c4567a;
+      }
+
+      .intro {
+        color: #333333;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #dddddd;
+        font-size: 13px;
+      }
+
+      h2 {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 15px;
+        font-weight: bold;
+        color: #c4567a;
+        margin: 32px 0 8px;
+        padding-top: 32px;
+        border-top: 1px solid #dddddd;
+      }
+
+      h3 {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 12px;
+        font-weight: bold;
+        color: #000000;
+        margin: 18px 0 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      p {
+        color: #222222;
+        margin-bottom: 10px;
+        font-size: 13px;
+      }
+
+      code {
+        font-family:
+          Courier New,
+          Courier,
+          monospace;
+        font-size: 12px;
+        color: #c4567a;
+        background: #fff0f4;
+        padding: 0 3px;
+        border: 1px solid #e8b4c0;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 8px 0 20px;
+        font-size: 12px;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      thead tr {
+        background: #fff0f4;
+        border-top: 1px solid #c4567a;
+        border-bottom: 1px solid #c4567a;
+      }
+
+      th {
+        text-align: left;
+        padding: 5px 8px;
+        font-size: 11px;
+        font-weight: bold;
+        color: #333333;
+      }
+
+      td {
+        padding: 4px 8px;
+        border-bottom: 1px solid #eeeeee;
+        vertical-align: top;
+        color: #222222;
+      }
+
+      tbody tr:hover td {
+        background: #fff8fa;
+      }
+
+      .cn {
+        font-family:
+          Courier New,
+          Courier,
+          monospace;
+        color: #a03050;
+        font-weight: bold;
+        white-space: nowrap;
+      }
+
+      .cs {
+        font-family:
+          Courier New,
+          Courier,
+          monospace;
+        color: #444444;
+        font-size: 11px;
+        white-space: nowrap;
+      }
+
+      .note {
+        background: #fff8fa;
+        border: 1px solid #e8b4c0;
+        border-left: 3px solid #c4567a;
+        padding: 8px 12px;
+        margin: 12px 0;
+        font-size: 12px;
+        font-family: Arial, Helvetica, sans-serif;
+        color: #333333;
+      }
+
+      .note strong {
+        color: #c4567a;
+      }
+
+      .term {
+        background: #fffbfc;
+        border: 1px solid #dddddd;
+        border-left: 3px solid #c4567a;
+        padding: 10px 14px;
+        margin: 12px 0;
+        font-family:
+          Courier New,
+          Courier,
+          monospace;
+        font-size: 12px;
+        line-height: 1.7;
+        color: #111111;
+      }
+
+      .term .p {
+        color: #c4567a;
+        font-weight: bold;
+      }
+      .term .c {
+        color: #000000;
+      }
+      .term .a {
+        color: #7a2840;
+      }
+      .term .o {
+        color: #444444;
+      }
+      .term .cm {
+        color: #aaaaaa;
+        font-style: italic;
+      }
+
+      footer {
+        border-top: 1px solid #dddddd;
+        padding: 12px 36px;
+        font-size: 11px;
+        color: #888888;
+        max-width: 900px;
+        margin: 0 auto;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      @media (max-width: 600px) {
+        .layout {
+          display: block;
+        }
+        .sidebar {
+          display: none;
+        }
+        .content {
+          padding: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-strip"></div>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="logo">PussyOS</div>
+        <div class="logo-sub">Documentation</div>
+        <div class="nav-label">Commands</div>
+        <a href="#commands">All Commands</a>
+        <div class="nav-label">File System</div>
+        <a href="#filesystem">Overview</a>
+        <a href="#filetransfer">File Transfer</a>
+        <a href="#editor">Text Editor</a>
+        <div class="nav-label">Networking</div>
+        <a href="#networking">Overview</a>
+        <a href="#networking">netsettings</a>
+        <a href="#networking">NetPussy (np)</a>
+        <a href="#networking">Port Scanner</a>
+        <a href="#networking">Chat</a>
+        <a href="#networking">Web Server</a>
+        <a href="#networking">netmon</a>
+        <div class="nav-label">Scripting</div>
+        <a href="#brainfuck">Brainfuck</a>
+        <a href="#pussylang">Pussy Lang</a>
+        <a href="#pussylang">Variables</a>
+        <a href="#pussylang">Control Flow</a>
+        <a href="#pussylang">Functions</a>
+        <a href="#pussylang">Lists</a>
+        <a href="#pussylang">Graphics</a>
+      </aside>
+      <main class="content">
+        <h1>PussyOS <em>Docs</em></h1>
+        <p class="intro">
+          Type commands at the <code>&gt;</code> prompt and hit Enter.
+          <code>&lt;angle brackets&gt;</code> = required,
+          <code>[square]</code> = optional.
+        </p>
+        <h2 id="commands">Commands</h2>
+        <h3>System</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Command</th>
+              <th>Syntax</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cn">help</td>
+              <td class="cs">help [category]</td>
+              <td>
+                Show commands. Categories: <code>sys</code> <code>file</code>
+                <code>app</code> <code>game</code>
+              </td>
+            </tr>
+            <tr>
+              <td class="cn">clear</td>
+              <td class="cs">clear</td>
+              <td>Clear the screen.</td>
+            </tr>
+            <tr>
+              <td class="cn">echo</td>
+              <td class="cs">echo &lt;text&gt;</td>
+              <td>Print text to screen.</td>
+            </tr>
+            <tr>
+              <td class="cn">math</td>
+              <td class="cs">math &lt;op&gt; &lt;a&gt; &lt;b&gt;</td>
+              <td>Calculator. e.g. <code>math + 5 3</code></td>
+            </tr>
+            <tr>
+              <td class="cn">boobs</td>
+              <td class="cs">boobs</td>
+              <td>ASCII art. Very important.</td>
+            </tr>
+            <tr>
+              <td class="cn">pciscan</td>
+              <td class="cs">pciscan</td>
+              <td>List detected PCI devices.</td>
+            </tr>
+            <tr>
+              <td class="cn">netmon</td>
+              <td class="cs">netmon</td>
+              <td>Real time network monitor (beta).</td>
+            </tr>
+            <tr>
+              <td class="cn">netsettings</td>
+              <td class="cs">netsettings</td>
+              <td>Configure network interface.</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>Files</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Command</th>
+              <th>Syntax</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cn">ls</td>
+              <td class="cs">ls</td>
+              <td>List files in current directory.</td>
+            </tr>
+            <tr>
+              <td class="cn">cd</td>
+              <td class="cs">cd [path]</td>
+              <td>Change directory. No args = go to root.</td>
+            </tr>
+            <tr>
+              <td class="cn">mkfile</td>
+              <td class="cs">mkfile &lt;name&gt;</td>
+              <td>Create an empty file.</td>
+            </tr>
+            <tr>
+              <td class="cn">write</td>
+              <td class="cs">write &lt;name&gt; &lt;text&gt;</td>
+              <td>Write text to a file.</td>
+            </tr>
+            <tr>
+              <td class="cn">cat</td>
+              <td class="cs">cat &lt;name&gt;</td>
+              <td>Print file contents.</td>
+            </tr>
+            <tr>
+              <td class="cn">rm</td>
+              <td class="cs">rm &lt;name&gt;</td>
+              <td>Delete a file.</td>
+            </tr>
+            <tr>
+              <td class="cn">mkdir</td>
+              <td class="cs">mkdir &lt;name&gt;</td>
+              <td>Create a directory.</td>
+            </tr>
+            <tr>
+              <td class="cn">rmdir</td>
+              <td class="cs">rmdir &lt;name&gt;</td>
+              <td>Remove a directory.</td>
+            </tr>
+            <tr>
+              <td class="cn">rename</td>
+              <td class="cs">rename &lt;old&gt; &lt;new&gt;</td>
+              <td>Rename a file or directory.</td>
+            </tr>
+            <tr>
+              <td class="cn">mv</td>
+              <td class="cs">mv &lt;src&gt; &lt;dest&gt;</td>
+              <td>Move a file.</td>
+            </tr>
+            <tr>
+              <td class="cn">edit</td>
+              <td class="cs">edit &lt;file&gt;</td>
+              <td>Open the text editor.</td>
+            </tr>
+            <tr>
+              <td class="cn">savefs</td>
+              <td class="cs">savefs [lba]</td>
+              <td>Save filesystem to disk. Default LBA: 100.</td>
+            </tr>
+            <tr>
+              <td class="cn">loadfs</td>
+              <td class="cs">loadfs [lba]</td>
+              <td>Load filesystem from disk. Default LBA: 100.</td>
+            </tr>
+            <tr>
+              <td class="cn">recvfile</td>
+              <td class="cs">recvfile</td>
+              <td>Receive a file from the host.</td>
+            </tr>
+            <tr>
+              <td class="cn">stoprecvfile</td>
+              <td class="cs">stoprecvfile</td>
+              <td>Stop file receive listener.</td>
+            </tr>
+            <tr>
+              <td class="cn">sendfile</td>
+              <td class="cs">sendfile &lt;name&gt;</td>
+              <td>Send a file to the host.</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>Apps</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Command</th>
+              <th>Syntax</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cn">draw</td>
+              <td class="cs">draw</td>
+              <td>Pixel drawing app.</td>
+            </tr>
+            <tr>
+              <td class="cn">show</td>
+              <td class="cs">show</td>
+              <td>Display a saved drawing.</td>
+            </tr>
+            <tr>
+              <td class="cn">anim</td>
+              <td class="cs">anim &lt;name&gt; [fps]</td>
+              <td>Play a saved animation. Default FPS: 2.</td>
+            </tr>
+            <tr>
+              <td class="cn">graph</td>
+              <td class="cs">graph</td>
+              <td>Graphing calculator.</td>
+            </tr>
+            <tr>
+              <td class="cn">3d</td>
+              <td class="cs">3d</td>
+              <td>3D shape visualizer.</td>
+            </tr>
+            <tr>
+              <td class="cn">piano</td>
+              <td class="cs">piano</td>
+              <td>Interactive piano keyboard.</td>
+            </tr>
+            <tr>
+              <td class="cn">matrix</td>
+              <td class="cs">matrix</td>
+              <td>Matrix calculator.</td>
+            </tr>
+            <tr>
+              <td class="cn">bf</td>
+              <td class="cs">bf &lt;file&gt;</td>
+              <td>Run a Brainfuck script.</td>
+            </tr>
+            <tr>
+              <td class="cn">pussy</td>
+              <td class="cs">pussy &lt;file&gt;</td>
+              <td>Run a Pussy Lang script.</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>Games</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Command</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cn">snake</td>
+              <td>Classic Snake. Arrow keys to move.</td>
+            </tr>
+            <tr>
+              <td class="cn">pong</td>
+              <td>Pong.</td>
+            </tr>
+            <tr>
+              <td class="cn">3dgame</td>
+              <td>First person 3D walking simulator.</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>Network</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Command</th>
+              <th>Syntax</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cn">np</td>
+              <td class="cs">np &lt;ip&gt; [port]</td>
+              <td>Open a raw TCP connection (NetPussy).</td>
+            </tr>
+            <tr>
+              <td class="cn">chat</td>
+              <td class="cs">chat</td>
+              <td>Chat with the host machine.</td>
+            </tr>
+            <tr>
+              <td class="cn">webserver</td>
+              <td class="cs">webserver [file]</td>
+              <td>Start a TCP web server.</td>
+            </tr>
+            <tr>
+              <td class="cn">npps</td>
+              <td class="cs">npps &lt;ip&gt; &lt;start&gt; &lt;end&gt;</td>
+              <td>Port scanner.</td>
+            </tr>
+          </tbody>
+        </table>
+        <h2 id="filesystem">File System</h2>
+        <p>
+          PussyOS has its own in memory filesystem. Everything lives in RAM
+          while the OS runs files won't survive a reboot unless you save them to
+          disk with <code>savefs</code>.
+        </p>
+        <div class="term">
+          <span class="cm"># basic workflow</span><br />
+          <span class="p">&gt; </span><span class="c">mkdir </span
+          ><span class="a">projects</span><br />
+          <span class="p">&gt; </span><span class="c">cd </span
+          ><span class="a">projects</span><br />
+          <span class="p">&gt; </span><span class="c">mkfile </span
+          ><span class="a">notes.txt</span><br />
+          <span class="p">&gt; </span><span class="c">write </span
+          ><span class="a">notes.txt hello world</span><br />
+          <span class="p">&gt; </span><span class="c">cat </span
+          ><span class="a">notes.txt</span><br />
+          <span class="o">hello world</span><br /><br />
+          <span class="cm"># save everything to disk</span><br />
+          <span class="p">&gt; </span><span class="c">savefs</span><br />
+          <span class="o"
+            >Saving filesystem to LBA 100... saved successfully!</span
+          >
+        </div>
+        <div class="note">
+          <strong>Note:</strong> Both <code>savefs</code> and
+          <code>loadfs</code> default to LBA 100. Pass a number to use a
+          different sector e.g. <code>savefs 200</code>.
+        </div>
+        <h2 id="filetransfer">File Transfer</h2>
+        <p>
+          Send and receive files between PussyOS and the host machine over the
+          network. Requires a working E1000 network connection.
+        </p>
+        <h3>Receiving</h3>
+        <p>
+          Run <code>recvfile</code> to start listening, then have the host send
+          the file. Run <code>stoprecvfile</code> when done.
+        </p>
+        <div class="term">
+          <span class="p">&gt; </span><span class="c">recvfile</span><br />
+          <span class="o">Listening for incoming file...</span><br />
+          <span class="cm"># host sends the file over the network</span><br />
+          <span class="p">&gt; </span><span class="c">stoprecvfile</span>
+        </div>
+        <h3>Sending</h3>
+        <p>
+          Use <code>sendfile</code> with the name of a file that already exists
+          in the filesystem.
+        </p>
+        <div class="term">
+          <span class="p">&gt; </span><span class="c">sendfile </span
+          ><span class="a">notes.txt</span>
+        </div>
+        <h2 id="editor">Text Editor</h2>
+        <p>
+          The <code>edit</code> command opens a fullscreen text editor. If the
+          file doesn't exist it gets created automatically.
+        </p>
+        <div class="term">
+          <span class="p">&gt; </span><span class="c">edit </span
+          ><span class="a">notes.txt</span>
+        </div>
+        <p>
+          Type freely, navigate with arrow keys, delete with Backspace. Save and
+          exit with the key combo shown at the bottom of the editor.
+        </p>
+        <div class="note">
+          <strong>edit vs write:</strong> Use <code>edit</code> for interactive
+          writing, use <code>write</code> for quick one liners or inside
+          scripts.
+        </div>
+        <h2 id="networking">Networking</h2>
+        <p>
+          PussyOS has real networking via an Intel E1000 card. The stack handles
+          ARP, TCP, and UDP from scratch. The card initializes automatically at
+          boot. If it's not detected, all network commands fail run
+          <code>pciscan</code> to check. Configure your IP and MAC with
+          <code>netsettings</code> before connecting to anything.
+        </p>
+        <h3>netsettings</h3>
+        <p>
+          Fullscreen panel to view and edit your IP, MAC, gateway IP, and
+          gateway MAC. Arrow keys to select a field, Enter to edit, ESC to exit.
+        </p>
+        <div class="term">
+          <span class="p">&gt; </span><span class="c">netsettings</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>What it is</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cn">My IP</td>
+              <td>The IP address PussyOS uses on the network.</td>
+            </tr>
+            <tr>
+              <td class="cn">Gateway IP</td>
+              <td>Your router. Required for reaching outside the subnet.</td>
+            </tr>
+            <tr>
+              <td class="cn">My MAC</td>
+              <td>Hardware address of the E1000 card.</td>
+            </tr>
+            <tr>
+              <td class="cn">Gateway MAC</td>
+              <td>
+                Router MAC. Auto resolved via ARP when you connect, or set
+                manually.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>NetPussy np</h3>
+        <p>
+          Raw TCP client. Connects to any IP and port, then shows a menu of
+          premade payloads you can fire at the target. Press R to switch to raw
+          input mode and type your own data.
+        </p>
+        <div class="term">
+          <span class="p">&gt; </span><span class="c">np </span
+          ><span class="a">192.168.0.1 80</span><br />
+          <span class="cm"
+            ># arrow keys to pick payload, Enter to send, R for raw mode, ESC to
+            disconnect</span
+          >
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Payloads</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cn">SMB</td>
+              <td>SMB negotiate (v1 detect), SMB2 negotiate</td>
+            </tr>
+            <tr>
+              <td class="cn">HTTP</td>
+              <td>GET /, GET example.com, OPTIONS /</td>
+            </tr>
+            <tr>
+              <td class="cn">FTP</td>
+              <td>Anonymous login</td>
+            </tr>
+            <tr>
+              <td class="cn">Mail</td>
+              <td>SMTP EHLO, POP3 CAPA, IMAP CAPABILITY</td>
+            </tr>
+            <tr>
+              <td class="cn">Redis</td>
+              <td>PING, INFO dump, CONFIG GET *</td>
+            </tr>
+            <tr>
+              <td class="cn">Other</td>
+              <td>
+                MongoDB isMaster, Elasticsearch info, WinRM check, null probe,
+                raw input
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>Port Scanner npps</h3>
+        <p>
+          Scans a TCP port range on a target and lists open ports with service
+          names where known. Progress bar updates live. ESC aborts mid scan,
+          arrow keys scroll results after.
+        </p>
+        <div class="term">
+          <span class="p">&gt; </span><span class="c">npps </span
+          ><span class="a">192.168.0.1 1 1024</span>
+        </div>
+        <h3>Chat</h3>
+        <p>
+          UDP chat on port 9999 between PussyOS and the host. The host sends
+          first PussyOS picks up that address and uses it for replies from then
+          on.
+        </p>
+        <div class="term">
+          <span class="p">&gt; </span><span class="c">chat</span><br />
+          <span class="cm"
+            ># waiting for host to send first, then type and Enter to reply, ESC
+            to exit</span
+          >
+        </div>
+        <h3>Web Server webserver</h3>
+        <p>
+          TCP server on port 80 with a fullscreen HTML editor. Write your page,
+          <code>Ctrl+D</code> to deploy it live, <code>Ctrl+S</code> to save to
+          the filesystem, <code>Ctrl+X</code> to exit. A request counter in the
+          title bar shows hits.
+        </p>
+        <div class="term">
+          <span class="p">&gt; </span><span class="c">webserver</span><br />
+          <span class="p">&gt; </span><span class="c">webserver </span
+          ><span class="a">mypage.html</span
+          ><span class="cm"> # load existing file</span>
+        </div>
+        <div class="note">
+          <strong>Note:</strong> The page is not live until you hit
+          <code>Ctrl+D</code>. The status bar at the bottom tells you if you're
+          deployed or not.
+        </div>
+        <h3>Network Monitor netmon</h3>
+        <p>
+          Live packet monitor. Prints all incoming traffic to the screen in real
+          time useful for debugging ARP, UDP, and TCP activity. Beta, no
+          filtering yet. ESC to stop.
+        </p>
+        <div class="term">
+          <span class="p">&gt; </span><span class="c">netmon</span>
+        </div>
+        <!-- BRAINFUCK -->
+        <h2 id="brainfuck">Brainfuck</h2>
+        <p>
+          PussyOS runs a numeric variant of Brainfuck. Instead of the classic
+          symbols, you use digits 0 7. Write your script to a file and run it
+          with <code>bf</code>.
+        </p>
+        <div class="term">
+          <span class="p">&gt; </span><span class="c">bf </span
+          ><span class="a">hello.bf</span>
+        </div>
+        <h3>Instruction Set</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Digit</th>
+              <th>Classic BF</th>
+              <th>What it does</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cn">0</td>
+              <td class="cs">&gt;</td>
+              <td>Move pointer right</td>
+            </tr>
+            <tr>
+              <td class="cn">1</td>
+              <td class="cs">&lt;</td>
+              <td>Move pointer left</td>
+            </tr>
+            <tr>
+              <td class="cn">2</td>
+              <td class="cs">+</td>
+              <td>Increment current cell</td>
+            </tr>
+            <tr>
+              <td class="cn">3</td>
+              <td class="cs"></td>
+              <td>Decrement current cell</td>
+            </tr>
+            <tr>
+              <td class="cn">4</td>
+              <td class="cs">.</td>
+              <td>Output current cell as ASCII</td>
+            </tr>
+            <tr>
+              <td class="cn">5</td>
+              <td class="cs">,</td>
+              <td>Read one keypress into current cell</td>
+            </tr>
+            <tr>
+              <td class="cn">6</td>
+              <td class="cs">[</td>
+              <td>Jump past matching 7 if cell is 0</td>
+            </tr>
+            <tr>
+              <td class="cn">7</td>
+              <td class="cs">]</td>
+              <td>Jump back to matching 6 if cell is not 0</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>Limits</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Thing</th>
+              <th>Limit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cn">Tape size</td>
+              <td>30,000 cells wraps at both ends</td>
+            </tr>
+            <tr>
+              <td class="cn">Max code length</td>
+              <td>8,192 characters</td>
+            </tr>
+            <tr>
+              <td class="cn">Max loop depth</td>
+              <td>256</td>
+            </tr>
+            <tr>
+              <td class="cn">Max iterations</td>
+              <td>10,000,000 then stops with a warning</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          Anything that isn't 0 7 is ignored, so you can write comments freely
+          in the same file.
+        </p>
+        <div class="term">
+          <span class="cm"># set cell to 65 (ASCII 'A') then output it</span
+          ><br />
+          <span class="c"
+            >222222222222222222222222222222222222222222222222222222222222222224</span
+          ><br />
+          <span class="o">A</span>
+        </div>
+        <div class="note">
+          <strong>Note:</strong> Brackets are validated before execution starts.
+          A mismatched 6 or 7 errors out immediately and tells you the position.
+        </div>
+        <!-- PUSSYLANG -->
+        <h2 id="pussylang">Pussy Lang</h2>
+        <p>
+          Pussy Lang is PussyOS's own scripting language. Files use the
+          <code>.p</code> or <code>.pussy</code> extension and run with
+          <code>pussy</code>. Scripts open in an interactive fullscreen viewer
+          output scrolls live, ESC exits. When the script finishes, output is
+          saved to <code>output.txt</code> automatically (or wherever you point
+          <code>outfile</code>).
+        </p>
+        <div class="term">
+          <span class="p">&gt; </span><span class="c">pussy </span
+          ><span class="a">myscript.p</span>
+        </div>
+        <div class="note">
+          <strong>Keys while running:</strong> Up/Down to scroll output. ESC to
+          exit.
+        </div>
+        <h3>Variables</h3>
+        <p>
+          Variables are referenced with <code>$name</code>. No declaration
+          needed just set them.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Command</th>
+              <th>Syntax</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cn">set</td>
+              <td class="cs">set $x 42</td>
+              <td>Set a variable. Works with numbers and strings.</td>
+            </tr>
+            <tr>
+              <td class="cn">add</td>
+              <td class="cs">add $x 10</td>
+              <td>Add to a numeric variable in place.</td>
+            </tr>
+            <tr>
+              <td class="cn">sub</td>
+              <td class="cs">sub $x 5</td>
+              <td>Subtract from a numeric variable in place.</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>Output</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Command</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cn">say &lt;text&gt;</td>
+              <td>Print a line. Expands <code>$vars</code> inside strings.</td>
+            </tr>
+            <tr>
+              <td class="cn">sayinline &lt;text&gt;</td>
+              <td>Same but no newline.</td>
+            </tr>
+            <tr>
+              <td class="cn">outfile &lt;name&gt;</td>
+              <td>
+                Set the output save file. Default: <code>output.txt</code>.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="term">
+          <span class="c">set</span> <span class="a">$name "world"</span><br />
+          <span class="c">say</span> <span class="a">"hello $name"</span><br />
+          <span class="o">hello world</span>
+        </div>
+        <h3>Input</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Command</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cn">input $var</td>
+              <td>Wait for the user to type a line and store it.</td>
+            </tr>
+            <tr>
+              <td class="cn">getkey $var</td>
+              <td>Read the last pressed key's scancode (non blocking).</td>
+            </tr>
+            <tr>
+              <td class="cn">waitkey $var</td>
+              <td>Block until a key is pressed, store its scancode.</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>Control Flow</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Command</th>
+              <th>Syntax</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cn">if</td>
+              <td class="cs">if $x == 5 { ... }</td>
+              <td>
+                Run block if condition is true. Operators: <code>==</code>
+                <code>!=</code> <code>&lt;</code> <code>&gt;</code>
+                <code>&lt;=</code> <code>&gt;=</code>
+              </td>
+            </tr>
+            <tr>
+              <td class="cn">loop</td>
+              <td class="cs">loop 10 { ... }</td>
+              <td>Repeat a block N times.</td>
+            </tr>
+            <tr>
+              <td class="cn">while</td>
+              <td class="cs">while $x &lt; 10 { ... }</td>
+              <td>
+                Loop until condition is false. Capped at 10,000 iterations.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="term">
+          <span class="c">set</span> <span class="a">$i 0</span><br />
+          <span class="c">while</span> <span class="a">$i &lt; 3 {</span><br />
+            <span class="c">say</span> <span class="a">"tick $i"</span><br />
+            <span class="c">add</span> <span class="a">$i 1</span><br />
+          <span class="a">}</span><br />
+          <span class="o">tick 0</span><br />
+          <span class="o">tick 1</span><br />
+          <span class="o">tick 2</span>
+        </div>
+        <h3>Functions</h3>
+        <p>
+          Define with <code>func</code>, call with <code>call</code>. Return
+          values land in <code>$ret</code>. Variables are scoped per call saved
+          and restored automatically. Max call depth: 50.
+        </p>
+        <div class="term">
+          <span class="c">func</span> <span class="a">greet $who {</span><br />
+            <span class="c">say</span> <span class="a">"hello $who"</span><br />
+            <span class="c">return</span> <span class="a">"done"</span><br />
+          <span class="a">}</span><br /><br />
+          <span class="c">call</span> <span class="a">greet "pussy"</span><br />
+          <span class="o">hello pussy</span>
+        </div>
+        <h3>Lists</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Command</th>
+              <th>Syntax</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cn">list</td>
+              <td class="cs">list $mylist</td>
+              <td>Create an empty list.</td>
+            </tr>
+            <tr>
+              <td class="cn">push</td>
+              <td class="cs">push $mylist "val"</td>
+              <td>Append to list. Max 100 items.</td>
+            </tr>
+            <tr>
+              <td class="cn">pop</td>
+              <td class="cs">pop $mylist</td>
+              <td>Remove last item.</td>
+            </tr>
+            <tr>
+              <td class="cn">get</td>
+              <td class="cs">get $mylist 0</td>
+              <td>Get item at index. Result goes into <code>$result</code>.</td>
+            </tr>
+            <tr>
+              <td class="cn">setat</td>
+              <td class="cs">setat $mylist 0 "new"</td>
+              <td>Replace item at index.</td>
+            </tr>
+            <tr>
+              <td class="cn">remove</td>
+              <td class="cs">remove $mylist 2</td>
+              <td>Delete item at index, shifts rest down.</td>
+            </tr>
+            <tr>
+              <td class="cn">size</td>
+              <td class="cs">size $mylist</td>
+              <td>Length goes into <code>$result</code>.</td>
+            </tr>
+            <tr>
+              <td class="cn">clear</td>
+              <td class="cs">clear $mylist</td>
+              <td>Empty the list.</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>Graphics</h3>
+        <p>
+          Direct access to the 80x25 VGA text buffer. Colors are standard CGA
+          palette values (0 255).
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Command</th>
+              <th>Syntax</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cn">pixel</td>
+              <td class="cs">pixel &lt;x&gt; &lt;y&gt; &lt;color&gt;</td>
+              <td>Draw a filled block at x,y.</td>
+            </tr>
+            <tr>
+              <td class="cn">pixelchar</td>
+              <td class="cs">
+                pixelchar &lt;x&gt; &lt;y&gt; &lt;char&gt; &lt;color&gt;
+              </td>
+              <td>Draw a specific ASCII character code at x,y.</td>
+            </tr>
+            <tr>
+              <td class="cn">rect</td>
+              <td class="cs">
+                rect &lt;x&gt; &lt;y&gt; &lt;w&gt; &lt;h&gt; &lt;color&gt;
+              </td>
+              <td>Draw a filled rectangle.</td>
+            </tr>
+            <tr>
+              <td class="cn">line</td>
+              <td class="cs">
+                line &lt;x1&gt; &lt;y1&gt; &lt;x2&gt; &lt;y2&gt; &lt;color&gt;
+              </td>
+              <td>Horizontal or vertical lines only.</td>
+            </tr>
+            <tr>
+              <td class="cn">clearscreen</td>
+              <td class="cs">clearscreen [color]</td>
+              <td>Fill the whole screen. Default: 0 (black).</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="term">
+          <span class="cm"># clear to black, draw a rectangle</span><br />
+          <span class="c">clearscreen</span> <span class="a">0</span><br />
+          <span class="c">rect</span> <span class="a">10 5 20 8 13</span>
+        </div>
+        <h3>Misc</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Command</th>
+              <th>Syntax</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cn">sleep</td>
+              <td class="cs">sleep &lt;ms&gt;</td>
+              <td>Busywait pause. Very approximate.</td>
+            </tr>
+            <tr>
+              <td class="cn">bitand</td>
+              <td class="cs">bitand &lt;a&gt; &lt;b&gt;</td>
+              <td>Bitwise AND. Result goes into <code>$result</code>.</td>
+            </tr>
+            <tr>
+              <td class="cn">cmd</td>
+              <td class="cs">cmd &lt;command&gt;</td>
+              <td>Run a PussyOS shell command from inside a script.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="note">
+          <strong>Comments:</strong> Any line starting with <code>#</code> is
+          ignored.
+        </div>
+      </main>
+    </div>
+    <footer>PussyOS Documentation</footer>
+  </body>
+</html>
